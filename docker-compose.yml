@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:18
+    container_name: datlich-postgres
+    environment:
+      POSTGRES_USER: datlich
+      POSTGRES_PASSWORD: datlich
+      POSTGRES_DB: datlich
+      TZ: Asia/Ho_Chi_Minh
+    ports:
+      # 5434 de khong dung cong 5432/5433 cua cac container khac tren may
+      - "5434:5432"
+    volumes:
+      - datlich_pgdata:/var/lib/postgresql
+      # Chi chay lan dau (khi volume con trong). Thu tu theo ten file.
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+      - ./db/slots.sql:/docker-entrypoint-initdb.d/03_slots.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datlich -d datlich"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  datlich_pgdata:

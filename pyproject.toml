@@ -1,0 +1,21 @@
+[project]
+name = "datlich-backend"
+version = "0.2.0"
+description = "Backend dat lich bao duong o to - Trung tam XYZ (Sprint 2, Bao Huy)"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "psycopg[binary,pool]",
+    "pyjwt",
+    "argon2-cffi",
+    "pydantic-settings",
+    "tzdata",
+]
+
+[dependency-groups]
+dev = ["pytest", "httpx"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
