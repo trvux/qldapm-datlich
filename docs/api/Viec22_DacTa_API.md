@@ -303,7 +303,7 @@ Chưa đóng băng. Đây là đề xuất của Huy để Frontend lên kế ho
 | `POST /appointments/{id}/reschedule` | Body `{slot_id, service_id?}`; tối đa 2 lần (BR22); nếu chỗ mới hết thì giữ nguyên lịch cũ (BR21) | #37 |
 | `GET /reports/appointments?from=&to=` | Chỉ Quản lý (BR24): đếm theo ngày hẹn, theo trạng thái, theo dịch vụ | #39 |
 
-**Quy ước khóa khi viết các luồng đổi/hủy** (để không deadlock với luồng đặt lịch): luôn khóa dòng `users` trước, rồi dòng `time_slots`; khi cần khóa hai khung giờ thì khóa theo `slot_id` tăng dần. Chi tiết trong `app/appointments.py`.
+**Quy ước khóa khi viết các luồng đổi/hủy** (để không deadlock với luồng đặt lịch): luôn khóa dòng `users` trước, rồi dòng `time_slots`; khi cần khóa hai khung giờ thì khóa theo `slot_id` tăng dần. Chi tiết trong `backend/app/appointments.py`.
 
 ## 7. Giới hạn đã biết
 
@@ -327,6 +327,6 @@ Chưa đóng băng. Đây là đề xuất của Huy để Frontend lên kế ho
 **Về khung giờ 2 giờ vs 1 giờ**, hai hướng:
 
 1. **Giữ 8 khung 1 giờ (khuyến nghị)**: không phải sửa gì ở Backend, CSDL, test và tài liệu đã chốt. Frontend vẽ lưới 8 ô thay vì 4 ô; wireframe chỉ cần sửa lại cho khớp (wireframe vốn chỉ để "vừa đủ để code", theo Risk R5).
-2. **Đổi sang 4 ca 2 giờ**: chỉ cần đổi dữ liệu trong `db/slots.sql` (`end_time = start_time + 2 giờ`, 4 dòng giờ bắt đầu), không đổi cấu trúc bảng. Nhưng phải sửa BR07, BR08, Acceptance Criteria (Việc #21) và Test Case (Việc #30) cho khớp.
+2. **Đổi sang 4 ca 2 giờ**: chỉ cần đổi dữ liệu trong `backend/db/slots.sql` (`end_time = start_time + 2 giờ`, 4 dòng giờ bắt đầu), không đổi cấu trúc bảng. Nhưng phải sửa BR07, BR08, Acceptance Criteria (Việc #21) và Test Case (Việc #30) cho khớp.
 
 Chưa đối chiếu chi tiết WF-04 (theo dõi, đổi, hủy), WF-05 (nhân viên) và WF-07 (báo cáo) vì các API đó thuộc Sprint 3 (mục 6).

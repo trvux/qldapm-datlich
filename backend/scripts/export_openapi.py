@@ -1,6 +1,6 @@
-"""Xuất OpenAPI ra docs/openapi.json để Frontend import vào Postman/Insomnia hoặc sinh type.
+"""Xuất OpenAPI ra docs/api/openapi.json (ở gốc repo) để Frontend import vào Postman/Insomnia hoặc sinh type.
 
-Chạy:  uv run python scripts/export_openapi.py
+Chạy (trong thư mục backend/):  uv run python scripts/export_openapi.py
 """
 import json
 import os
@@ -16,6 +16,6 @@ os.environ.setdefault("JWT_SECRET", "x" * 32)
 
 from app.main import app  # noqa: E402
 
-out = ROOT / "docs" / "openapi.json"
+out = ROOT.parent / "docs" / "api" / "openapi.json"
 out.write_text(json.dumps(app.openapi(), ensure_ascii=False, indent=2) + "\n")
 print(f"Đã ghi {out}")

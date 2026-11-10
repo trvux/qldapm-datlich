@@ -18,12 +18,13 @@ Nói cách khác: luồng đã chạy thông ở tầng API, chưa chạy thông
 ## 2. Cách chạy lại
 
 ```bash
+cd backend
 docker compose up -d     # PostgreSQL ở cổng 5434
 uv sync
 uv run pytest -v
 ```
 
-Bộ test tự tạo database `datlich_test` từ `db/schema.sql`, `seed.sql`, `slots.sql`, bật uvicorn thật và gọi bằng HTTP; mỗi test bắt đầu từ trạng thái sạch. Không đụng tới database `datlich` dùng để demo.
+Bộ test tự tạo database `datlich_test` từ `backend/db/schema.sql`, `seed.sql`, `slots.sql`, bật uvicorn thật và gọi bằng HTTP; mỗi test bắt đầu từ trạng thái sạch. Không đụng tới database `datlich` dùng để demo.
 
 ## 3. Kết quả
 
@@ -31,9 +32,9 @@ Bộ test tự tạo database `datlich_test` từ `db/schema.sql`, `seed.sql`, `
 
 | Nhóm | File | Số test | Nội dung chính |
 |---|---|---:|---|
-| Đăng nhập, phân quyền (#25) | `tests/test_auth.py` | 24 | 3 vai trò đăng nhập, sai mật khẩu và email lạ trả lỗi giống nhau, tài khoản khóa (BR02), mật khẩu lưu dạng băm (BR01), token giả/hết hạn/ký sai khóa/`alg=none`/thiếu `exp` đều bị từ chối, khóa tài khoản có hiệu lực ngay, ma trận quyền (BR03) |
-| Đặt lịch và quy tắc (#29) | `tests/test_booking.py` | 42 | Thành công và trạng thái ban đầu (BR14), hết chỗ (BR09), trả chỗ khi từ chối (BR15), chống trùng xe (BR11), giới hạn 3 lịch (BR11), xe của người khác (BR12), dịch vụ ngừng (BR05), giờ làm việc (BR07), biên 2 giờ và 14 ngày (BR10), cấu hình sức chứa (F07), thêm xe và biển số duy nhất |
-| Luồng đầu-cuối và đồng thời (#32) | `tests/test_e2e_flow.py` | 13 | Luồng đầy đủ khách → nhân viên, luồng từ chối, không xử lý lịch hai lần, quyền xem lịch (BR23), đặt đồng thời (BR13) |
+| Đăng nhập, phân quyền (#25) | `backend/tests/test_auth.py` | 24 | 3 vai trò đăng nhập, sai mật khẩu và email lạ trả lỗi giống nhau, tài khoản khóa (BR02), mật khẩu lưu dạng băm (BR01), token giả/hết hạn/ký sai khóa/`alg=none`/thiếu `exp` đều bị từ chối, khóa tài khoản có hiệu lực ngay, ma trận quyền (BR03) |
+| Đặt lịch và quy tắc (#29) | `backend/tests/test_booking.py` | 42 | Thành công và trạng thái ban đầu (BR14), hết chỗ (BR09), trả chỗ khi từ chối (BR15), chống trùng xe (BR11), giới hạn 3 lịch (BR11), xe của người khác (BR12), dịch vụ ngừng (BR05), giờ làm việc (BR07), biên 2 giờ và 14 ngày (BR10), cấu hình sức chứa (F07), thêm xe và biển số duy nhất |
+| Luồng đầu-cuối và đồng thời (#32) | `backend/tests/test_e2e_flow.py` | 13 | Luồng đầy đủ khách → nhân viên, luồng từ chối, không xử lý lịch hai lần, quyền xem lịch (BR23), đặt đồng thời (BR13) |
 
 ### Luồng chính đã chạy thông
 
@@ -71,7 +72,7 @@ Không có lỗi nào còn mở ở Backend trong phạm vi đã kiểm. Các v�
 | # | Mức | Vấn đề | Trạng thái |
 |---|---|---|---|
 | 1 | Thấp | Lỗi trong chính mã test (dùng `with` trên `httpx.Client` đã mở) làm 60/79 test báo lỗi lần chạy đầu | Đã sửa, không phải lỗi sản phẩm |
-| 2 | Trung bình | **Wireframe WF-03 dùng 4 ca 2 giờ, trong khi BR07 và CSDL dùng 8 khung 1 giờ** | **Mở**, cần cả nhóm chọn hướng, xem `Viec22_DacTa_API.md` mục 8 |
+| 2 | Trung bình | **Wireframe WF-03 dùng 4 ca 2 giờ, trong khi BR07 và CSDL dùng 8 khung 1 giờ** | **Mở**, cần cả nhóm chọn hướng, xem `docs/api/Viec22_DacTa_API.md` mục 8 |
 | 3 | Thấp | Wireframe nhập tay biển số, API chọn xe từ danh sách | Mở, Frontend xử lý theo gợi ý ở mục 8 của tài liệu API |
 | 4 | Thấp | Thông báo trong `details` của `VALIDATION_ERROR` do thư viện sinh bằng tiếng Anh | Chấp nhận, đã ghi chú cho Frontend; dịch theo `field` |
 | 5 | Thấp | Chưa giới hạn số lần đăng nhập sai | Chấp nhận cho đồ án, ghi ở tài liệu API mục 7 |
