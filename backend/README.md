@@ -19,8 +19,9 @@ Ngoài kế hoạch, để chạy được luồng "nhân viên xác nhận lị
 | Việc | Nội dung | Sản phẩm |
 |---|---|---|
 | #37 | Đổi và hủy lịch (F05) | `app/appointments.py`, `app/routers/appointments.py`, `tests/test_change_cancel.py` |
+| #39 | Báo cáo thống kê (F08) | `app/routers/reports.py`, `tests/test_reports.py` |
 
-Đặc tả ở [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) mục 3.10.
+Đặc tả ở [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) mục 3.10, 3.11.
 
 ## Chạy nhanh
 
@@ -55,7 +56,7 @@ Mỗi khách có 2 xe. Có 8 dịch vụ (1 đã ngừng để test BR05) và kh
 uv run pytest -v
 ```
 
-110 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
+124 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
 
 ## Cấu trúc
 
@@ -68,9 +69,9 @@ app/
   deps.py            lấy người dùng hiện tại, kiểm tra vai trò (BR03)
   rules.py           quy tắc giờ làm việc, múi giờ VN, trạng thái chiếm chỗ
   appointments.py    nghiệp vụ đặt lịch (1 transaction, khóa dòng) và xử lý của nhân viên
-  routers/           auth, services, vehicles, slots, appointments
+  routers/           auth, services, vehicles, slots, appointments, reports
 db/                  schema (Việc #10, đã đóng băng), dữ liệu mẫu, sinh khung giờ
-tests/               test đăng nhập, đặt lịch, đổi/hủy lịch, đầu-cuối và đồng thời
+tests/               test đăng nhập, đặt lịch, đổi/hủy lịch, báo cáo, đầu-cuối và đồng thời
 ```
 
 ## Ghi chú thiết kế

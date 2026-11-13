@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import db
 from app.config import get_settings
 from app.errors import install_error_handlers
-from app.routers import appointments, auth, services, slots, vehicles
+from app.routers import appointments, auth, reports, services, slots, vehicles
 
 
 @asynccontextmanager
@@ -19,8 +19,8 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="API Đặt lịch bảo dưỡng ô tô - Trung tâm XYZ",
-    version="0.2.0",
-    description="Backend Sprint 2 (Việc #22, #23, #25, #29). Mã BR## tham chiếu tài liệu "
+    version="0.3.0",
+    description="Backend Sprint 2-3 (Việc #22, #23, #25, #29, #37, #39). Mã BR## tham chiếu tài liệu "
     "Quy tắc nghiệp vụ (Việc #8).",
     lifespan=lifespan,
 )
@@ -33,7 +33,7 @@ app.add_middleware(
 )
 install_error_handlers(app)
 
-for r in (auth, services, vehicles, slots, appointments):
+for r in (auth, services, vehicles, slots, appointments, reports):
     app.include_router(r.router)
 
 

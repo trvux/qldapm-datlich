@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "API Đặt lịch bảo dưỡng ô tô - Trung tâm XYZ",
-    "description": "Backend Sprint 2 (Việc #22, #23, #25, #29). Mã BR## tham chiếu tài liệu Quy tắc nghiệp vụ (Việc #8).",
-    "version": "0.2.0"
+    "description": "Backend Sprint 2-3 (Việc #22, #23, #25, #29, #37, #39). Mã BR## tham chiếu tài liệu Quy tắc nghiệp vụ (Việc #8).",
+    "version": "0.3.0"
   },
   "paths": {
     "/auth/login": {
@@ -658,6 +658,83 @@
         }
       }
     },
+    "/reports/appointments": {
+      "get": {
+        "tags": [
+          "Báo cáo thống kê (F08)"
+        ],
+        "summary": "Appointment Report",
+        "description": "Thống kê lịch hẹn theo ngày hẹn, trạng thái, dịch vụ (F08, BR24).\n\n\"Ngày hẹn\" là ngày của khung giờ (slot_date), không phải ngày khách bấm đặt. Số liệu đếm\ntrực tiếp từ bảng appointments, không có bảng thống kê riêng nên không bao giờ lệch.",
+        "operationId": "appointment_report_reports_appointments_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Mặc định: ngày 1 của tháng này",
+              "title": "From"
+            },
+            "description": "Mặc định: ngày 1 của tháng này"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Mặc định: hôm nay (giờ VN)",
+              "title": "To"
+            },
+            "description": "Mặc định: hôm nay (giờ VN)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -818,6 +895,58 @@
         ],
         "title": "AppointmentOut"
       },
+      "AppointmentReport": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "format": "date",
+            "title": "To"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "by_date": {
+            "items": {
+              "$ref": "#/components/schemas/ReportByDate"
+            },
+            "type": "array",
+            "title": "By Date",
+            "description": "Chỉ gồm ngày có ít nhất 1 lịch, tăng dần"
+          },
+          "by_status": {
+            "items": {
+              "$ref": "#/components/schemas/ReportByStatus"
+            },
+            "type": "array",
+            "title": "By Status",
+            "description": "Đủ cả 6 trạng thái, kể cả số 0"
+          },
+          "by_service": {
+            "items": {
+              "$ref": "#/components/schemas/ReportByService"
+            },
+            "type": "array",
+            "title": "By Service",
+            "description": "Giảm dần theo số lịch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "total",
+          "by_date",
+          "by_status",
+          "by_service"
+        ],
+        "title": "AppointmentReport"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -931,6 +1060,74 @@
           "reason"
         ],
         "title": "RejectRequest"
+      },
+      "ReportByDate": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "count"
+        ],
+        "title": "ReportByDate"
+      },
+      "ReportByService": {
+        "properties": {
+          "service_id": {
+            "type": "integer",
+            "title": "Service Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "name",
+          "count"
+        ],
+        "title": "ReportByService"
+      },
+      "ReportByStatus": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "CANCELLED",
+              "REJECTED"
+            ],
+            "title": "Status"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "count"
+        ],
+        "title": "ReportByStatus"
       },
       "RescheduleRequest": {
         "properties": {
