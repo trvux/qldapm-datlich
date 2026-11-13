@@ -20,6 +20,7 @@ Ngoài kế hoạch, để chạy được luồng "nhân viên xác nhận lị
 |---|---|---|
 | #37 | Đổi và hủy lịch (F05) | `app/appointments.py`, `app/routers/appointments.py`, `tests/test_change_cancel.py` |
 | #39 | Báo cáo thống kê (F08) | `app/routers/reports.py`, `tests/test_reports.py` |
+| #42 | Rà soát và sửa lỗi Backend (mới phần tự rà soát) | `app/errors.py`, `tests/test_hardening.py`, [`docs/sprint3/Viec37_39_42_KetQua_Backend.md`](../docs/sprint3/Viec37_39_42_KetQua_Backend.md) |
 
 Đặc tả ở [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) mục 3.10, 3.11.
 
@@ -56,7 +57,7 @@ Mỗi khách có 2 xe. Có 8 dịch vụ (1 đã ngừng để test BR05) và kh
 uv run pytest -v
 ```
 
-124 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
+133 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
 
 ## Cấu trúc
 
