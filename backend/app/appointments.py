@@ -1,17 +1,47 @@
 """Nghiệp vụ lịch hẹn: đặt lịch (F03 + F07) và xử lý của nhân viên (F04, bản tối thiểu)."""
+from datetime import timedelta
+
 import psycopg
 from psycopg import errors as pg_errors
 
 from app import rules
 from app.config import get_settings
 from app.errors import AppError
-from app.schemas import AppointmentCreate
+from app.schemas import AppointmentCreate, RescheduleRequest
 
 _TIME_ERRORS = {
     "IN_PAST": (422, "SLOT_IN_PAST", "Khung giờ này đã qua."),
     "TOO_SOON": (422, "BOOKING_TOO_SOON", "Cần đặt lịch trước giờ hẹn ít nhất {h} giờ."),
     "TOO_FAR": (422, "BOOKING_TOO_FAR", "Chỉ được đặt lịch trước tối đa {d} ngày."),
 }
+
+
+def _ensure_slot_bookable(slot: dict) -> None:
+    """BR07, BR10: giờ làm việc và khoảng thời gian cho phép đặt. Dùng chung cho đặt và đổi lịch."""
+    cfg = get_settings()
+    if not rules.is_working_slot(slot["slot_date"], slot["start_time"], slot["end_time"]):
+        raise AppError(422, "SLOT_NOT_WORKING_HOUR", "Khung giờ nằm ngoài giờ làm việc.")
+    reason = rules.closed_reason(
+        slot["slot_date"], slot["start_time"], remaining=1, now=rules.now_vn()
+    )
+    if reason is not None:
+        status, code, msg = _TIME_ERRORS[reason]
+        raise AppError(
+            status,
+            code,
+            msg.format(h=cfg.booking_min_lead_hours, d=cfg.booking_max_advance_days),
+        )
+
+
+def _ensure_service_bookable(conn: psycopg.Connection, service_id: int) -> None:
+    """BR05: dịch vụ ngừng hoạt động không đặt mới được."""
+    service = conn.execute(
+        "SELECT service_id, is_active FROM services WHERE service_id = %s", (service_id,)
+    ).fetchone()
+    if service is None:
+        raise AppError(404, "SERVICE_NOT_FOUND", "Dịch vụ không tồn tại.")
+    if not service["is_active"]:
+        raise AppError(422, "SERVICE_INACTIVE", "Dịch vụ này đã ngừng cung cấp.")
 
 
 def create_appointment(conn: psycopg.Connection, customer_id: int, req: AppointmentCreate) -> int:
@@ -41,29 +71,8 @@ def create_appointment(conn: psycopg.Connection, customer_id: int, req: Appointm
             if slot is None:
                 raise AppError(404, "SLOT_NOT_FOUND", "Khung giờ không tồn tại.")
 
-            # BR07, BR10: giờ làm việc và khoảng thời gian cho phép đặt
-            if not rules.is_working_slot(slot["slot_date"], slot["start_time"], slot["end_time"]):
-                raise AppError(422, "SLOT_NOT_WORKING_HOUR", "Khung giờ nằm ngoài giờ làm việc.")
-            reason = rules.closed_reason(
-                slot["slot_date"], slot["start_time"], remaining=1, now=rules.now_vn()
-            )
-            if reason is not None:
-                status, code, msg = _TIME_ERRORS[reason]
-                raise AppError(
-                    status,
-                    code,
-                    msg.format(h=cfg.booking_min_lead_hours, d=cfg.booking_max_advance_days),
-                )
-
-            # BR05: dịch vụ ngừng hoạt động không đặt mới được
-            service = conn.execute(
-                "SELECT service_id, is_active FROM services WHERE service_id = %s",
-                (req.service_id,),
-            ).fetchone()
-            if service is None:
-                raise AppError(404, "SERVICE_NOT_FOUND", "Dịch vụ không tồn tại.")
-            if not service["is_active"]:
-                raise AppError(422, "SERVICE_INACTIVE", "Dịch vụ này đã ngừng cung cấp.")
+            _ensure_slot_bookable(slot)  # BR07, BR10
+            _ensure_service_bookable(conn, req.service_id)  # BR05
 
             # BR12: xe phải thuộc khách đang đặt. Xe của người khác trả 404, không để lộ
             # việc biển số đó có tồn tại.
@@ -227,3 +236,166 @@ def reject_appointment(
     conn: psycopg.Connection, appointment_id: int, staff_id: int, reason: str
 ) -> None:
     _decide_pending(conn, appointment_id, staff_id, "REJECTED", reject_reason=reason)
+
+
+# ---------------------------------------------------------------------------------------------
+# F05: đổi và hủy lịch (Việc #37, BR19-BR22)
+# ---------------------------------------------------------------------------------------------
+
+_CHANGEABLE = ("PENDING", "CONFIRMED")  # BR19
+
+
+def _lock_own_for_change(
+    conn: psycopg.Connection, customer_id: int, appointment_id: int, extra_slot_ids: tuple = ()
+) -> tuple[dict, dict]:
+    """Khóa mọi thứ cần cho đổi/hủy theo đúng thứ tự đã quy ước, rồi kiểm tra BR19.
+
+    Thứ tự: dòng khách -> các khung giờ (slot_id tăng dần) -> dòng lịch hẹn. Cùng thứ tự với
+    create_appointment nên hai luồng không thể chờ vòng tròn nhau (deadlock). Khóa dòng khách
+    trước cũng khiến mọi thao tác của CÙNG một khách xếp hàng, nên khung giờ hiện tại của lịch
+    không thể bị đổi giữa lúc đọc (SELECT không khóa) và lúc khóa khung giờ.
+
+    Trả về (lịch hẹn, {slot_id: dòng khung giờ}). Phải gọi bên trong conn.transaction().
+    """
+    conn.execute("SELECT 1 FROM users WHERE user_id = %s FOR NO KEY UPDATE", (customer_id,))
+
+    # Lịch của người khác trả 404, không phải 403, để không lộ mã lịch nào tồn tại (BR23)
+    peek = conn.execute(
+        "SELECT slot_id FROM appointments WHERE appointment_id = %s AND customer_id = %s",
+        (appointment_id, customer_id),
+    ).fetchone()
+    if peek is None:
+        raise AppError(404, "APPOINTMENT_NOT_FOUND", "Không tìm thấy lịch hẹn.")
+
+    slots: dict[int, dict | None] = {}
+    for slot_id in sorted({peek["slot_id"], *extra_slot_ids}):
+        slots[slot_id] = conn.execute(
+            """SELECT slot_id, slot_date, start_time, end_time, max_capacity
+               FROM time_slots WHERE slot_id = %s FOR UPDATE""",
+            (slot_id,),
+        ).fetchone()
+
+    appt = conn.execute(
+        """SELECT appointment_id, vehicle_id, service_id, slot_id, status, change_count
+           FROM appointments WHERE appointment_id = %s FOR UPDATE""",
+        (appointment_id,),
+    ).fetchone()
+
+    # BR19: chỉ Chờ xác nhận / Đã xác nhận. Đọc lại SAU khi khóa vì nhân viên có thể vừa
+    # chuyển lịch sang Đang thực hiện hoặc Từ chối.
+    if appt["status"] not in _CHANGEABLE:
+        raise AppError(
+            409,
+            "INVALID_STATUS_TRANSITION",
+            f"Lịch đang ở trạng thái {appt['status']}, không thể đổi hoặc hủy.",
+        )
+    # BR19: còn từ 4 giờ trở lên tính theo khung giờ HIỆN TẠI của lịch (đúng 4 giờ vẫn được)
+    old = slots[appt["slot_id"]]
+    lead = rules.slot_start(old["slot_date"], old["start_time"]) - rules.now_vn()
+    hours = get_settings().change_min_lead_hours
+    if lead < timedelta(hours=hours):
+        raise AppError(
+            422,
+            "CHANGE_TOO_LATE",
+            f"Chỉ được đổi hoặc hủy lịch trước giờ hẹn ít nhất {hours} giờ.",
+        )
+    return appt, slots
+
+
+def cancel_appointment(conn: psycopg.Connection, customer_id: int, appointment_id: int) -> None:
+    """BR19, BR20: hủy lịch. Chỗ trả lại tự động vì CANCELLED không còn nằm trong SLOT_OCCUPYING."""
+    with conn.transaction():
+        appt, _ = _lock_own_for_change(conn, customer_id, appointment_id)
+        conn.execute(
+            "UPDATE appointments SET status = 'CANCELLED', updated_at = now() "
+            "WHERE appointment_id = %s",
+            (appointment_id,),
+        )
+        conn.execute(
+            """INSERT INTO appointment_status_history
+                   (appointment_id, old_status, new_status, changed_by, note)
+               VALUES (%s, %s, 'CANCELLED', %s, 'Khách hủy lịch')""",
+            (appointment_id, appt["status"], customer_id),
+        )
+
+
+def reschedule_appointment(
+    conn: psycopg.Connection, customer_id: int, appointment_id: int, req: RescheduleRequest
+) -> None:
+    """BR19, BR21, BR22: đổi sang khung giờ khác (có thể kèm đổi dịch vụ).
+
+    Chỉ có MỘT transaction: giữ chỗ mới và trả chỗ cũ là cùng một lệnh UPDATE, nên nếu bất kỳ
+    kiểm tra nào thất bại (hết chỗ, trùng xe...) thì lịch cũ giữ nguyên, không bao giờ rơi vào
+    trạng thái "đã mất chỗ cũ mà chưa có chỗ mới".
+    """
+    cfg = get_settings()
+    try:
+        with conn.transaction():
+            appt, slots = _lock_own_for_change(
+                conn, customer_id, appointment_id, extra_slot_ids=(req.slot_id,)
+            )
+            old = slots[appt["slot_id"]]
+            new = slots[req.slot_id]
+            if new is None:
+                raise AppError(404, "SLOT_NOT_FOUND", "Khung giờ không tồn tại.")
+
+            # BR22: tối đa 2 lần. CSDL cũng có CHECK change_count BETWEEN 0 AND 2 làm lưới an toàn.
+            if appt["change_count"] >= cfg.max_changes_per_appointment:
+                raise AppError(
+                    409,
+                    "CHANGE_LIMIT_REACHED",
+                    f"Lịch này đã đổi {appt['change_count']} lần, tối đa "
+                    f"{cfg.max_changes_per_appointment} lần.",
+                )
+            if req.slot_id == appt["slot_id"]:
+                raise AppError(422, "SAME_SLOT", "Khung giờ mới trùng với khung giờ hiện tại.")
+
+            _ensure_slot_bookable(new)  # BR21: khung mới phải qua BR07, BR10
+            service_id = req.service_id or appt["service_id"]
+            if service_id != appt["service_id"]:
+                _ensure_service_bookable(conn, service_id)  # BR05
+
+            # BR11: xe không có 2 lịch hiệu lực trong cùng khung giờ MỚI
+            dup = conn.execute(
+                """SELECT 1 FROM appointments
+                   WHERE vehicle_id = %s AND slot_id = %s AND status = ANY(%s)""",
+                (appt["vehicle_id"], req.slot_id, rules.SLOT_OCCUPYING),
+            ).fetchone()
+            if dup:
+                raise AppError(
+                    409, "VEHICLE_ALREADY_BOOKED", "Xe này đã có lịch trong khung giờ đó."
+                )
+
+            # BR08, BR09: chỗ trống ở khung giờ mới (lịch này chưa nằm trong khung mới nên
+            # không cần trừ ra)
+            booked = conn.execute(
+                "SELECT count(*) AS n FROM appointments WHERE slot_id = %s AND status = ANY(%s)",
+                (req.slot_id, rules.SLOT_OCCUPYING),
+            ).fetchone()["n"]
+            if booked >= new["max_capacity"]:
+                raise AppError(409, "SLOT_FULL", "Khung giờ mới đã hết chỗ.")
+
+            # BR22: lịch đã xác nhận mà đổi thì quay về Chờ xác nhận; handled_by về NULL vì
+            # chưa có nhân viên nào xác nhận khung giờ mới (lịch sử vẫn giữ ai đã xác nhận).
+            conn.execute(
+                """UPDATE appointments
+                   SET slot_id = %s, service_id = %s, status = 'PENDING', handled_by = NULL,
+                       change_count = change_count + 1, updated_at = now()
+                   WHERE appointment_id = %s""",
+                (req.slot_id, service_id, appointment_id),
+            )
+            note = (
+                f"Đổi lịch lần {appt['change_count'] + 1}: "
+                f"{old['slot_date']:%d/%m/%Y} {old['start_time']:%H:%M} -> "
+                f"{new['slot_date']:%d/%m/%Y} {new['start_time']:%H:%M}"
+            )
+            if service_id != appt["service_id"]:
+                note += f"; dịch vụ #{appt['service_id']} -> #{service_id}"
+            conn.execute(
+                """INSERT INTO appointment_status_history
+                       (appointment_id, old_status, new_status, changed_by, note)
+                   VALUES (%s, %s, 'PENDING', %s, %s)""",
+                (appointment_id, appt["status"], customer_id, note),
+            )
+    except pg_errors.UniqueViolation:
+        raise AppError(409, "VEHICLE_ALREADY_BOOKED", "Xe này đã có lịch trong khung giờ đó.")

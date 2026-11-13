@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     booking_min_lead_hours: int = 2          # BR10: đặt trước giờ hẹn ít nhất 2 giờ
     booking_max_advance_days: int = 14       # BR10: không đặt quá 14 ngày
     max_active_appointments: int = 3         # BR11: tối đa 3 lịch đang hiệu lực / khách
+    change_min_lead_hours: int = 4           # BR19: đổi/hủy trước giờ hẹn ít nhất 4 giờ
+    max_changes_per_appointment: int = 2     # BR22: mỗi lịch đổi tối đa 2 lần
 
 
 @lru_cache
