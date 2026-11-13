@@ -14,6 +14,14 @@ Thư mục `backend/` của repo dự án tổng (xem [README gốc](../README.m
 
 Ngoài kế hoạch, để chạy được luồng "nhân viên xác nhận lịch": `GET /services` (chỉ đọc), `GET/POST /vehicles`, `confirm` và `reject` bản tối thiểu. Các phần này được đánh dấu rõ trong code và tài liệu API; Tri (#26) và Quang (#27) có thể giữ hoặc thay.
 
+## Việc đã làm trong Sprint 3
+
+| Việc | Nội dung | Sản phẩm |
+|---|---|---|
+| #37 | Đổi và hủy lịch (F05) | `app/appointments.py`, `app/routers/appointments.py`, `tests/test_change_cancel.py` |
+
+Đặc tả ở [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) mục 3.10.
+
 ## Chạy nhanh
 
 Cần Docker, [uv](https://docs.astral.sh/uv/) và Python 3.13 trở lên.
@@ -47,14 +55,14 @@ Mỗi khách có 2 xe. Có 8 dịch vụ (1 đã ngừng để test BR05) và kh
 uv run pytest -v
 ```
 
-79 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
+110 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
 
 ## Cấu trúc
 
 ```
 app/
   main.py            khởi tạo FastAPI, CORS, router
-  config.py          cấu hình từ .env (kể cả tham số nghiệp vụ BR10, BR11)
+  config.py          cấu hình từ .env (kể cả tham số nghiệp vụ BR10, BR11, BR19, BR22)
   db.py              pool kết nối PostgreSQL
   security.py        băm mật khẩu argon2, JWT
   deps.py            lấy người dùng hiện tại, kiểm tra vai trò (BR03)
@@ -62,7 +70,7 @@ app/
   appointments.py    nghiệp vụ đặt lịch (1 transaction, khóa dòng) và xử lý của nhân viên
   routers/           auth, services, vehicles, slots, appointments
 db/                  schema (Việc #10, đã đóng băng), dữ liệu mẫu, sinh khung giờ
-tests/               test đăng nhập, đặt lịch, đầu-cuối và đồng thời
+tests/               test đăng nhập, đặt lịch, đổi/hủy lịch, đầu-cuối và đồng thời
 ```
 
 ## Ghi chú thiết kế
@@ -70,7 +78,7 @@ tests/               test đăng nhập, đặt lịch, đầu-cuối và đồn
 - **Ngôn ngữ: Python.** Đề bài (mục 2.3) ràng buộc Java hoặc Python, nên không dùng Go dù là ngôn ngữ quen thuộc.
 - **Chống đặt vượt chỗ (BR13):** kiểm tra và lưu lịch trong một transaction, khóa dòng khung giờ bằng `SELECT ... FOR UPDATE`. Chỉ mục duy nhất một phần trong CSDL là lưới an toàn chống trùng xe (BR11).
 - **Chỗ trống luôn được tính, không lưu:** `remaining = max_capacity - số lịch đang chiếm chỗ`, nên hủy hoặc từ chối tự trả chỗ và số liệu không thể lệch.
-- **Thứ tự khóa:** luôn khóa dòng khách trước, dòng khung giờ sau (khung giờ theo `slot_id` tăng dần) để các luồng đổi/hủy ở Sprint 3 không deadlock.
+- **Thứ tự khóa:** luôn khóa dòng khách trước, dòng khung giờ sau (khung giờ theo `slot_id` tăng dần) để luồng đổi/hủy không deadlock với luồng đặt lịch.
 - **Không có `JWT_SECRET` mặc định:** thiếu biến này thì app không khởi động.
 
 ## Vấn đề đang mở

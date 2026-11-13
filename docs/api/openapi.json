@@ -357,7 +357,7 @@
     "/appointments": {
       "post": {
         "tags": [
-          "Lịch hẹn (F03, F04)"
+          "Lịch hẹn (F03, F04, F05)"
         ],
         "summary": "Create",
         "description": "Đặt lịch (F03). Kiểm tra trùng và năng lực (F07) trong cùng một transaction.",
@@ -404,7 +404,7 @@
     "/appointments/{appointment_id}": {
       "get": {
         "tags": [
-          "Lịch hẹn (F03, F04)"
+          "Lịch hẹn (F03, F04, F05)"
         ],
         "summary": "Get One",
         "operationId": "get_one_appointments__appointment_id__get",
@@ -448,10 +448,116 @@
         }
       }
     },
+    "/appointments/{appointment_id}/cancel": {
+      "post": {
+        "tags": [
+          "Lịch hẹn (F03, F04, F05)"
+        ],
+        "summary": "Cancel",
+        "description": "Khách hủy lịch của mình (F05, BR19, BR20). Chỉ khi còn từ 4 giờ trở lên.",
+        "operationId": "cancel_appointments__appointment_id__cancel_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "appointment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Appointment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments/{appointment_id}/reschedule": {
+      "post": {
+        "tags": [
+          "Lịch hẹn (F03, F04, F05)"
+        ],
+        "summary": "Reschedule",
+        "description": "Khách đổi khung giờ (và có thể đổi dịch vụ) của lịch mình (F05, BR19, BR21, BR22).",
+        "operationId": "reschedule_appointments__appointment_id__reschedule_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "appointment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Appointment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RescheduleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/appointments/{appointment_id}/confirm": {
       "post": {
         "tags": [
-          "Lịch hẹn (F03, F04)"
+          "Lịch hẹn (F03, F04, F05)"
         ],
         "summary": "Confirm",
         "operationId": "confirm_appointments__appointment_id__confirm_post",
@@ -498,7 +604,7 @@
     "/appointments/{appointment_id}/reject": {
       "post": {
         "tags": [
-          "Lịch hẹn (F03, F04)"
+          "Lịch hẹn (F03, F04, F05)"
         ],
         "summary": "Reject",
         "operationId": "reject_appointments__appointment_id__reject_post",
@@ -825,6 +931,31 @@
           "reason"
         ],
         "title": "RejectRequest"
+      },
+      "RescheduleRequest": {
+        "properties": {
+          "slot_id": {
+            "type": "integer",
+            "title": "Slot Id"
+          },
+          "service_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Id",
+            "description": "Bỏ trống thì giữ dịch vụ cũ (BR21)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slot_id"
+        ],
+        "title": "RescheduleRequest"
       },
       "ServiceOut": {
         "properties": {

@@ -104,6 +104,11 @@ class AppointmentCreate(BaseModel):
         return (v.strip() or None) if v is not None else None
 
 
+class RescheduleRequest(BaseModel):
+    slot_id: int
+    service_id: int | None = Field(default=None, description="Bỏ trống thì giữ dịch vụ cũ (BR21)")
+
+
 class RejectRequest(BaseModel):
     reason: str = Field(min_length=1, max_length=500)  # BR15: bắt buộc có lý do
 
@@ -157,3 +162,4 @@ class AppointmentOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     history: list[HistoryEntry]
+

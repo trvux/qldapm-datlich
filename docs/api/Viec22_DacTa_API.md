@@ -53,7 +53,7 @@ Mã `BR##` tham chiếu tài liệu *Quy tắc nghiệp vụ đặt lịch* (Vi�
 
 ## 2. Danh sách endpoint
 
-Cột **Trạng thái**: ✓ đã chạy và có test trong Sprint 2 · ◌ đề xuất, chưa làm (xem mục 6).
+Cột **Trạng thái**: ✓ đã chạy và có test (Sprint 2, 3) · ◌ đề xuất, chưa làm (xem mục 6).
 
 | Method | Đường dẫn | Ai gọi | Chức năng | Việc | Trạng thái |
 |---|---|---|---|---|---|
@@ -72,7 +72,7 @@ Cột **Trạng thái**: ✓ đã chạy và có test trong Sprint 2 · ◌ đ�
 | POST/PATCH | `/services`, `/services/{id}` | Quản lý | Thêm, sửa, ngừng dịch vụ (F01) | #26 | ◌ |
 | GET | `/appointments` | Khách (của mình), Nhân viên, Quản lý | Danh sách, lọc theo ngày và trạng thái (F04, F06) | #27, #38 | ◌ |
 | POST | `/appointments/{id}/start`, `/complete` | Nhân viên | Xe đến, hoàn thành (F04) | #27 | ◌ |
-| POST | `/appointments/{id}/reschedule`, `/cancel` | Khách | Đổi, hủy lịch (F05) | #37 | ◌ |
+| POST | `/appointments/{id}/reschedule`, `/cancel` | Khách | Đổi, hủy lịch (F05) | #37 | ✓ |
 | GET | `/reports/appointments` | Quản lý | Thống kê (F08) | #39 | ◌ |
 | GET | `/health` | Công khai | Kiểm tra server và DB còn sống | - | ✓ |
 
@@ -258,6 +258,27 @@ Chỉ `STAFF`, `MANAGER`. Chỉ áp dụng cho lịch đang `PENDING`.
 
 Response `200` là `AppointmentOut` đã cập nhật. Lỗi: `409 INVALID_STATUS_TRANSITION` (lịch không còn `PENDING`), `404 APPOINTMENT_NOT_FOUND`, `422` (thiếu lý do), `403 FORBIDDEN` (khách gọi).
 
+### 3.10. `POST /appointments/{id}/cancel` và `/reschedule` - Khách hủy, đổi lịch (F05)
+
+Chỉ `CUSTOMER`, chỉ lịch của mình (lịch người khác: `404 APPOINTMENT_NOT_FOUND`). Chỉ lịch `PENDING` hoặc `CONFIRMED`, và còn từ **4 giờ** trở lên tính theo khung giờ hiện tại của lịch (BR19; đúng 4 giờ vẫn được).
+
+- `cancel`: không có body. Lịch chuyển `CANCELLED`, chỗ trống được trả ngay (BR20).
+- `reschedule`: body `{ "slot_id": 25, "service_id": 3 }`, `service_id` bỏ trống thì giữ dịch vụ cũ. Khung mới phải qua đủ BR07-BR11 như lúc đặt. Lịch quay về `PENDING` (kể cả đang `CONFIRMED`, `handled_by` về `null`), `change_count` tăng 1, tối đa 2 lần (BR22). Hết chỗ hoặc lỗi bất kỳ thì lịch cũ giữ nguyên và không bị tính một lần đổi (BR21). Dòng lịch sử mới có `old_status`, `new_status` và `note` ghi khung giờ cũ -> mới.
+
+Response `200` là `AppointmentOut` đã cập nhật. Lỗi:
+
+| Status | `code` | Khi nào |
+|---|---|---|
+| 409 | `INVALID_STATUS_TRANSITION` | Lịch không còn `PENDING`/`CONFIRMED` (đang làm, xong, đã hủy, bị từ chối) |
+| 422 | `CHANGE_TOO_LATE` | Còn dưới 4 giờ tới giờ hẹn |
+| 409 | `CHANGE_LIMIT_REACHED` | Đã đổi đủ 2 lần (chỉ `reschedule`) |
+| 422 | `SAME_SLOT` | Khung mới trùng khung hiện tại (chỉ `reschedule`) |
+| 409 | `SLOT_FULL`, `VEHICLE_ALREADY_BOOKED` | Khung mới hết chỗ, hoặc xe đã có lịch ở khung đó |
+| 422 / 404 | `SLOT_NOT_WORKING_HOUR`, `BOOKING_TOO_SOON`, `BOOKING_TOO_FAR`, `SLOT_IN_PAST`, `SERVICE_INACTIVE` / `SLOT_NOT_FOUND`, `SERVICE_NOT_FOUND` | Như mục 3.7 |
+| 403 / 401 | `FORBIDDEN` / `UNAUTHENTICATED` | Không phải khách / chưa đăng nhập |
+
+Frontend: khi nhận `SLOT_FULL` thì gọi lại `GET /slots`, và khóa nút ngay khi bấm như ở đặt lịch.
+
 ## 4. Phân quyền (BR03)
 
 | Endpoint | Công khai | Khách | Nhân viên | Quản lý |
@@ -299,8 +320,6 @@ Chưa đóng băng. Đây là đề xuất của Huy để Frontend lên kế ho
 | `POST /services`, `PATCH /services/{id}` | Body như `ServiceOut` không có `service_id`; ngừng dịch vụ bằng `{"is_active": false}`, **không có DELETE** (BR05) | #26 |
 | `GET /appointments?status=&date=&from=&to=` | Khách chỉ thấy lịch của mình (BR23); nhân viên thấy tất cả (BR18); trả mảng `AppointmentOut` | #27, #38 |
 | `POST /appointments/{id}/start`, `/complete` | `CONFIRMED -> IN_PROGRESS -> COMPLETED`, không nhảy cóc, không đi ngược (BR17) | #27 |
-| `POST /appointments/{id}/cancel` | Chỉ `PENDING`/`CONFIRMED`, còn từ 4 giờ trở lên (BR19); trả chỗ ngay (BR20) | #37 |
-| `POST /appointments/{id}/reschedule` | Body `{slot_id, service_id?}`; tối đa 2 lần (BR22); nếu chỗ mới hết thì giữ nguyên lịch cũ (BR21) | #37 |
 | `GET /reports/appointments?from=&to=` | Chỉ Quản lý (BR24): đếm theo ngày hẹn, theo trạng thái, theo dịch vụ | #39 |
 
 **Quy ước khóa khi viết các luồng đổi/hủy** (để không deadlock với luồng đặt lịch): luôn khóa dòng `users` trước, rồi dòng `time_slots`; khi cần khóa hai khung giờ thì khóa theo `slot_id` tăng dần. Chi tiết trong `backend/app/appointments.py`.
