@@ -73,7 +73,7 @@ Cột **Trạng thái**: ✓ đã chạy và có test (Sprint 2, 3) · ◌ đề
 | GET | `/appointments` | Khách (của mình), Nhân viên, Quản lý | Danh sách, lọc theo ngày và trạng thái (F04, F06) | #27, #38 | ◌ |
 | POST | `/appointments/{id}/start`, `/complete` | Nhân viên | Xe đến, hoàn thành (F04) | #27 | ◌ |
 | POST | `/appointments/{id}/reschedule`, `/cancel` | Khách | Đổi, hủy lịch (F05) | #37 | ✓ |
-| GET | `/reports/appointments` | Quản lý | Thống kê (F08) | #39 | ◌ |
+| GET | `/reports/appointments` | Quản lý | Thống kê (F08) | #39 | ✓ |
 | GET | `/health` | Công khai | Kiểm tra server và DB còn sống | - | ✓ |
 
 > `confirm` và `reject` là **bản tối thiểu Huy làm thêm để chạy được luồng "nhân viên xác nhận lịch" ở Việc #32**.
@@ -279,6 +279,21 @@ Response `200` là `AppointmentOut` đã cập nhật. Lỗi:
 
 Frontend: khi nhận `SLOT_FULL` thì gọi lại `GET /slots`, và khóa nút ngay khi bấm như ở đặt lịch.
 
+### 3.11. `GET /reports/appointments?from=&to=` - Thống kê (F08)
+
+Chỉ `MANAGER` (BR24). `from` mặc định ngày 1 của tháng này, `to` mặc định hôm nay (giờ VN), tối đa 366 ngày (`422 INVALID_DATE_RANGE`, `DATE_RANGE_TOO_LARGE`). Lọc theo **ngày hẹn** (ngày của khung giờ), tính cả hai đầu.
+
+```json
+{
+  "from": "2026-11-01", "to": "2026-11-30", "total": 3,
+  "by_date":    [ { "date": "2026-11-16", "count": 2 } ],
+  "by_status":  [ { "status": "PENDING", "count": 1 }, "... đủ 6 trạng thái, kể cả 0" ],
+  "by_service": [ { "service_id": 1, "name": "Bao duong dinh ky 10.000 km", "count": 2 } ]
+}
+```
+
+`by_date` chỉ gồm ngày có lịch. `by_service` giảm dần theo số lịch, gồm mọi dịch vụ đang hoạt động (kể cả 0); dịch vụ đã ngừng chỉ hiện khi còn lịch cũ trong khoảng. Lịch `CANCELLED` và `REJECTED` vẫn được đếm (xem ở `by_status`). Ba mảng luôn cộng ra đúng `total`.
+
 ## 4. Phân quyền (BR03)
 
 | Endpoint | Công khai | Khách | Nhân viên | Quản lý |
@@ -320,7 +335,6 @@ Chưa đóng băng. Đây là đề xuất của Huy để Frontend lên kế ho
 | `POST /services`, `PATCH /services/{id}` | Body như `ServiceOut` không có `service_id`; ngừng dịch vụ bằng `{"is_active": false}`, **không có DELETE** (BR05) | #26 |
 | `GET /appointments?status=&date=&from=&to=` | Khách chỉ thấy lịch của mình (BR23); nhân viên thấy tất cả (BR18); trả mảng `AppointmentOut` | #27, #38 |
 | `POST /appointments/{id}/start`, `/complete` | `CONFIRMED -> IN_PROGRESS -> COMPLETED`, không nhảy cóc, không đi ngược (BR17) | #27 |
-| `GET /reports/appointments?from=&to=` | Chỉ Quản lý (BR24): đếm theo ngày hẹn, theo trạng thái, theo dịch vụ | #39 |
 
 **Quy ước khóa khi viết các luồng đổi/hủy** (để không deadlock với luồng đặt lịch): luôn khóa dòng `users` trước, rồi dòng `time_slots`; khi cần khóa hai khung giờ thì khóa theo `slot_id` tăng dần. Chi tiết trong `backend/app/appointments.py`.
 

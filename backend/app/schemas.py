@@ -163,3 +163,30 @@ class AppointmentOut(BaseModel):
     updated_at: datetime
     history: list[HistoryEntry]
 
+
+# ---------- Báo cáo thống kê (F08) ----------
+
+
+class ReportByDate(BaseModel):
+    date: date
+    count: int
+
+
+class ReportByStatus(BaseModel):
+    status: AppointmentStatus
+    count: int
+
+
+class ReportByService(BaseModel):
+    service_id: int
+    name: str
+    count: int
+
+
+class AppointmentReport(BaseModel):
+    date_from: date = Field(serialization_alias="from")
+    date_to: date = Field(serialization_alias="to")
+    total: int
+    by_date: list[ReportByDate] = Field(description="Chỉ gồm ngày có ít nhất 1 lịch, tăng dần")
+    by_status: list[ReportByStatus] = Field(description="Đủ cả 6 trạng thái, kể cả số 0")
+    by_service: list[ReportByService] = Field(description="Giảm dần theo số lịch")
