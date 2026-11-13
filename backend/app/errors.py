@@ -6,6 +6,7 @@ Frontend chỉ cần switch theo `code`, không phụ thuộc vào câu chữ c�
 """
 import logging
 
+import psycopg
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -41,6 +42,16 @@ def install_error_handlers(app: FastAPI) -> None:
         ]
         return JSONResponse(
             _body("VALIDATION_ERROR", "Dữ liệu gửi lên không hợp lệ.", details),
+            status_code=422,
+        )
+
+    @app.exception_handler(psycopg.DataError)
+    async def _bad_data(_: Request, exc: psycopg.DataError):
+        # CSDL từ chối giá trị khách gửi (ví dụ ký tự NUL trong chuỗi, mà PostgreSQL không lưu
+        # được). Đây là lỗi của dữ liệu đầu vào chứ không phải lỗi hệ thống nên trả 422, không 500.
+        log.warning("CSDL từ chối dữ liệu đầu vào: %s", exc)
+        return JSONResponse(
+            _body("VALIDATION_ERROR", "Dữ liệu gửi lên chứa ký tự hoặc giá trị không hợp lệ."),
             status_code=422,
         )
 
