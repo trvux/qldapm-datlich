@@ -56,7 +56,7 @@ Bộ test tự tạo database `datlich_test` từ `backend/db/schema.sql`, `seed
 | 1 khách gửi 6 yêu cầu cùng lúc vào 6 khung khác nhau | Đúng 3 lịch được lưu, 3 `BOOKING_LIMIT_REACHED` | Đạt |
 | Bấm đúp (4 yêu cầu giống hệt) | 1 thành công, 3 `VEHICLE_ALREADY_BOOKED` | Đạt |
 
-**Kiểm chứng test có bắt được lỗi thật.** Mình tạm bỏ từng cơ chế khóa rồi chạy lại:
+**Kiểm chứng test có bắt được lỗi thật.** Đã tạm bỏ từng cơ chế khóa rồi chạy lại:
 
 | Cố tình làm hỏng | Test đồng thời phản ứng |
 |---|---|
@@ -85,4 +85,4 @@ Không có lỗi nào còn mở ở Backend trong phạm vi đã kiểm. Các v�
 
 ## 6. Giờ công
 
-Chưa ghi giờ thực tế cho Sprint 2 vào bảng EVM (Việc #2), cần Huy tự điền theo thời gian thật; kế hoạch: #22 1,0h, #23 2,5h, #25 2,5h, #29 7,0h, #32 1,5h, tổng 14,5h.
+Đã ghi vào bảng giờ EVM (Việc #2) ngày 10/11/2026: mỗi việc #22, #23, #25, #29, #32 là 0,2 giờ (khoảng 10 phút), tổng 1,0 giờ, so với kế hoạch 14,5 giờ (#22 1,0h, #23 2,5h, #25 2,5h, #29 7,0h, #32 1,5h). Chênh lệch lớn vì phần viết code, test và tài liệu có dùng công cụ AI hỗ trợ; đây là rủi ro R3 (ước lượng effort không chính xác) đã xảy ra, cần hiệu chỉnh ước lượng cho Sprint 3.

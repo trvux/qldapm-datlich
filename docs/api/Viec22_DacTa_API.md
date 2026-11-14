@@ -362,4 +362,12 @@ Chưa đóng băng. Đây là đề xuất của Huy để Frontend lên kế ho
 1. **Giữ 8 khung 1 giờ (khuyến nghị)**: không phải sửa gì ở Backend, CSDL, test và tài liệu đã chốt. Frontend vẽ lưới 8 ô thay vì 4 ô; wireframe chỉ cần sửa lại cho khớp (wireframe vốn chỉ để "vừa đủ để code", theo Risk R5).
 2. **Đổi sang 4 ca 2 giờ**: chỉ cần đổi dữ liệu trong `backend/db/slots.sql` (`end_time = start_time + 2 giờ`, 4 dòng giờ bắt đầu), không đổi cấu trúc bảng. Nhưng phải sửa BR07, BR08, Acceptance Criteria (Việc #21) và Test Case (Việc #30) cho khớp.
 
-Chưa đối chiếu chi tiết WF-04 (theo dõi, đổi, hủy), WF-05 (nhân viên) và WF-07 (báo cáo) vì các API đó thuộc Sprint 3 (mục 6).
+Đã đối chiếu thêm WF-04, WF-05, WF-07 (ngày 10/11/2026):
+
+| Màn | Điểm lệch |
+|---|---|
+| WF-04 Theo dõi, đổi/hủy | "Khung giờ: Ca 1 (08:00 - 10:00)" và hai dòng bảng `08:00-10:00`, `13:00-15:00` đều theo ca 2 giờ. Mã lịch `#LH-2026-015` khác kiểu `#LH-18` ở WF-05. Thanh trạng thái thiếu "Bị từ chối" và "Đã hủy" |
+| WF-05 Nhân viên | 4 ô "Ca" (2/3, 3/3, 2/3, 0/3) và cột "Khung giờ" theo ca 2 giờ. Bộ lọc Ngày và Lọc đã có sẵn. Nút "Từ chối" chưa có ô nhập lý do (BR15 bắt buộc). Tab 2 ghi `(F01)` nhưng nhân viên chỉ tra cứu (F02, BR03). Số điện thoại đè lên cột Biển số ở dòng #LH-15 |
+| WF-07 Báo cáo | "Hiệu suất sử dụng năng lực theo Ca 1-4"; BR24 chỉ yêu cầu thống kê theo ngày hẹn, trạng thái, dịch vụ |
+
+Các API tương ứng thuộc Sprint 3 (mục 6).
