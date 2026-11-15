@@ -12,6 +12,24 @@ import { cn } from "@/lib/utils"
 
 const WEEKDAY = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
 
+/** Sức chứa: mỗi chỗ một chấm, chấm đặc là chỗ đã có xe đặt (ba chấm đặc trên ba chỗ là đầy). Quá 6 chỗ thì ghi số. Luôn có chữ cho trình đọc màn hình. */
+function Capacity({ booked, max }: { booked: number; max: number }) {
+  return (
+    <span className="flex items-center gap-1 text-[11px] leading-tight text-muted-foreground">
+      <span className="sr-only">Đã đặt {booked} trên {max} chỗ</span>
+      {max <= 6 ? (
+        <span aria-hidden className="flex gap-[3px]">
+          {Array.from({ length: max }, (_, i) => (
+            <span key={i} className={cn("size-1.5 rounded-full border border-primary", i < booked ? "bg-primary" : "bg-transparent")} />
+          ))}
+        </span>
+      ) : (
+        <span aria-hidden className="tabular-nums">Đã đặt {booked}/{max}</span>
+      )}
+    </span>
+  )
+}
+
 /** Chọn ngày (dải số ngày đặt trước tối đa theo GET /policy, cuộn ngang trên mobile) rồi chọn khung giờ. Khung hết chỗ bị khóa. */
 export function SlotPicker({ value, onChange }: { value: number | null; onChange: (slot: Slot) => void }) {
   const from = useMemo(() => todayISO(), [])
@@ -37,7 +55,7 @@ export function SlotPicker({ value, onChange }: { value: number | null; onChange
   const slots = (byDay.get(day) ?? []).slice().sort((a, b) => a.start_time.localeCompare(b.start_time))
   return (
     <div className="flex flex-col gap-4">
-      <div role="tablist" aria-label="Chọn ngày" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+      <div role="tablist" aria-label="Chọn ngày" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:grid md:grid-cols-7 md:overflow-visible md:px-0 md:pb-0">
         {days.map((d) => {
           const dt = new Date(d + "T00:00:00")
           const free = (byDay.get(d) ?? []).some((s) => s.bookable)
@@ -50,7 +68,7 @@ export function SlotPicker({ value, onChange }: { value: number | null; onChange
               aria-selected={active}
               onClick={() => setPicked(d)}
               className={cn(
-                "flex min-w-14 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2 py-2 text-sm transition-colors",
+                "flex min-w-14 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2 py-2 text-sm transition-colors md:min-w-0",
                 active ? "border-primary bg-accent text-accent-foreground" : "hover:bg-muted",
                 !free && !active && "text-muted-foreground"
               )}
@@ -82,12 +100,13 @@ export function SlotPicker({ value, onChange }: { value: number | null; onChange
               >
                 <span className="font-medium">{formatRange(s.start_time, s.end_time)}</span>
                 {!s.bookable && <span className="text-[11px] leading-tight text-muted-foreground">{slotClosedLabel(s.closed_reason)}</span>}
+                {(s.bookable || s.closed_reason === "FULL") && <Capacity booked={s.booked} max={s.max_capacity} />}
               </button>
             )
           })}
         </div>
       )}
-      <p className="text-xs text-muted-foreground">Khung giờ mờ không nhận lịch, lý do ghi bên dưới giờ.</p>
+      <p className="text-xs text-muted-foreground">Khung giờ mờ không nhận lịch, lý do ghi bên dưới giờ. Chấm đặc là chỗ đã có xe đặt; đủ chấm đặc là hết chỗ.</p>
     </div>
   )
 }

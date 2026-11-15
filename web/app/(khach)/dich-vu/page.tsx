@@ -7,7 +7,7 @@ import { BrandPhoto } from "@/components/brand/motifs"
 import { ErrorNote } from "@/components/error-note"
 import { AppPage } from "@/components/layout/app-page"
 import { PageHeader } from "@/components/layout/page-header"
-import { ServiceCard } from "@/components/service-card"
+import { ServiceCard, longestDuration } from "@/components/service-card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api"
@@ -24,12 +24,12 @@ export default function ServicesPage() {
         description="Thời lượng và giá tham khảo của từng dịch vụ. Chọn dịch vụ rồi đặt lịch trong một phút."
         actions={<Button asChild><Link href="/dat-lich">Đặt lịch</Link></Button>}
       />
-      <BrandPhoto src={PHOTOS.workshop.src} alt={PHOTOS.workshop.alt} priority sizes="(min-width: 1152px) 1088px, 100vw" position="center 55%" className="h-40 rounded-lg border sm:h-52" />
+      <BrandPhoto src={PHOTOS.gauges.src} alt={PHOTOS.gauges.alt} priority sizes="(min-width: 1152px) 1088px, 100vw" position="center 52%" className="h-56 rounded-lg border sm:h-72 lg:h-80" />
       <ErrorNote error={error} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {loading
           ? Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-52" />)
-          : (data ?? []).map((s, i) => <ServiceCard key={s.service_id} service={s} index={i} />)}
+          : (data ?? []).map((s, i) => <ServiceCard key={s.service_id} service={s} index={i} scaleMinutes={longestDuration(data ?? [])} />)}
       </div>
       <p className="flex items-start gap-2.5 rounded-lg border bg-muted/50 p-4 text-sm text-muted-foreground">
         <Info className="mt-0.5 size-4 shrink-0 text-primary" />

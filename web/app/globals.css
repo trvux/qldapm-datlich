@@ -250,6 +250,65 @@
   pointer-events: none;
 }
 
+/* Lỗ khoan hai mép phiếu lịch hẹn: nửa vòng tròn đều nhau, màu nền trang, viền theo --border */
+.punch-edge {
+  position: absolute;
+  top: 16px;
+  bottom: 8px;
+  width: 10px;
+  background-image: radial-gradient(circle at var(--cx) 50%, var(--background) 0 5px, color-mix(in oklch, var(--foreground) 35%, transparent) 5px 6px, transparent 6px);
+  background-size: 100% 20px;
+  background-repeat: repeat-y;
+  pointer-events: none;
+}
+.punch-edge-l { left: 0; --cx: 0; }
+.punch-edge-r { right: 0; --cx: 100%; }
+
+/* Thanh thời lượng ở thẻ dịch vụ: tô dần từ 0 tới độ dài thật (mỗi thẻ lệch một nhịp --i),
+   rồi sọc chéo trôi liên tục như dải đồng hồ đang chạy. Chu kỳ trôi = chu kỳ sọc theo trục x. */
+@keyframes duration-fill {
+  from { width: 0; }
+  to { width: var(--w); }
+}
+@keyframes stripe-drift {
+  to { background-position: 8.4853px 0; }
+}
+.duration-fill {
+  width: var(--w);
+  background-image: repeating-linear-gradient(135deg, color-mix(in oklab, var(--primary) 55%, transparent) 0 1.5px, transparent 1.5px 6px);
+  background-size: 8.4853px 8.4853px;
+  animation:
+    duration-fill 800ms cubic-bezier(0.22, 1, 0.36, 1) both,
+    stripe-drift 900ms linear infinite;
+  animation-delay: calc(var(--i, 0) * 80ms + 150ms), 0ms;
+}
+/* Sọc trắng trôi trên nút "Đặt lịch" khi rê chuột vào thẻ */
+.hatch-drift {
+  background-image: repeating-linear-gradient(135deg, color-mix(in oklab, white 22%, transparent) 0 1.5px, transparent 1.5px 6px);
+  background-size: 8.4853px 8.4853px;
+  animation: stripe-drift 900ms linear infinite;
+}
+
+/* Hình xe ở hồ sơ xe: chạy vào khi tải trang; mặt đường là ba hàng ô cờ có phối cảnh, mỗi hàng trôi một chu kỳ ô trong 222ms (hàng sát bánh xe 10 đơn vị/222ms = 45 đơn vị/giây, hàng gần nhanh hơn tỷ lệ với cỡ ô),
+   bánh lăn khớp hàng đường sát bánh (71 đơn vị/giây; chu kỳ quay đặt theo bán kính ngay trong illustrations.tsx), quay thuận chiều kim đồng hồ vì xe chạy sang phải */
+@keyframes car-drive-in { from { transform: translateX(-28px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes wheel-spin { to { transform: rotate(360deg); } }
+@keyframes road-run { to { transform: translateX(calc(var(--p) * -1)); } }
+.car-drive { animation: car-drive-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.car-wheel { transform-box: fill-box; transform-origin: center; animation: wheel-spin 2.2s linear infinite; }
+@keyframes wind-gust {
+  0% { stroke-dashoffset: 1; opacity: 0; transform: translateX(0); }
+  6% { opacity: 0.8; }
+  36% { stroke-dashoffset: 0; }
+  62% { stroke-dashoffset: -1; opacity: 0.8; transform: translateX(-46px); }
+  70% { opacity: 0; }
+  100% { stroke-dashoffset: -1; opacity: 0; transform: translateX(-46px); }
+}
+/* Gió: nét vẽ lướt từ phải sang trái (đường dài 1 đơn vị pathLength, nét 1 và khoảng trống 1): đầu nét kéo dài ra trước, rồi đuôi bị xóa theo;
+   mỗi đoạn ease-in-out nên chạy nhanh rồi chậm dần, chỉ hoạt động khoảng 70% chu kỳ ngắn nên thỉnh thoảng mới có */
+.car-wind { opacity: 0; stroke-dasharray: 1 1; animation: wind-gust var(--wd, 4s) ease-in-out infinite; animation-delay: var(--wl, 0s); }
+.car-road { animation: road-run var(--t, 200ms) linear infinite; }
+
 /* Người dùng bật "Reduce motion": gần như tắt hết chuyển động ở cả hai khu */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
