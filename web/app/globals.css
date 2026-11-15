@@ -73,6 +73,10 @@
     --status-rejected: oklch(0.95 0.035 25);
     --status-rejected-foreground: oklch(0.45 0.15 27);
 
+    /* Dải thương hiệu: nền xanh đua, chữ kem. Ở chế độ tối dùng xanh đậm hơn nền để vẫn nổi lên */
+    --band: #1f4d3a;
+    --band-foreground: #f2ecd9;
+
     /* Mật độ "Vừa" (khu khách) */
     --control-h: 2.5rem;
     --row-h: 2.75rem;
@@ -112,6 +116,9 @@
     --sidebar-accent-foreground: var(--brand-200);
     --sidebar-border: oklch(0.42 0.01 100);
     --sidebar-ring: var(--brand-400);
+
+    --band: oklch(0.27 0.04 164);
+    --band-foreground: #f2ecd9;
 
     --status-pending: oklch(0.3 0.05 80);
     --status-pending-foreground: oklch(0.88 0.1 88);
@@ -155,6 +162,8 @@
     --color-brand-800: var(--brand-800);
     --color-brand-900: var(--brand-900);
     --color-brand-950: var(--brand-950);
+    --color-band: var(--band);
+    --color-band-foreground: var(--band-foreground);
     --color-status-pending: var(--status-pending);
     --color-status-pending-foreground: var(--status-pending-foreground);
     --color-status-confirmed: var(--status-confirmed);
@@ -223,6 +232,22 @@
   svg.lucide {
     stroke-width: 1.75;
     }
+}
+
+/* Khung ảnh hình khiên (xem ShieldFrame) và đường chỉ khâu của thẻ nổi bật */
+.shield-clip {
+  clip-path: url(#marque-shield);
+}
+.stitch {
+  position: relative;
+}
+.stitch::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px dashed color-mix(in oklch, currentColor 32%, transparent);
+  border-radius: calc(var(--radius) - 2px);
+  pointer-events: none;
 }
 
 /* Người dùng bật "Reduce motion": gần như tắt hết chuyển động ở cả hai khu */

@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import { ErrorNote } from "@/components/error-note"
+import { AdminPage } from "@/components/layout/admin-page"
+import { PageHeader } from "@/components/layout/page-header"
 import { RequireManager } from "@/components/shell/admin-shell"
 import { StatusBadge } from "@/components/status-badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -24,8 +26,8 @@ function Report() {
   const maxService = Math.max(1, ...(data?.by_service ?? []).map((s) => s.count))
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1"><h1 className="text-2xl">Báo cáo</h1><p className="text-sm text-muted-foreground">Thống kê lịch hẹn theo ngày, trạng thái và dịch vụ.</p></div>
+    <AdminPage>
+      <PageHeader size="sm" title="Báo cáo" description="Thống kê lịch hẹn theo ngày, trạng thái và dịch vụ." />
       <div className="grid grid-cols-2 gap-3 sm:flex sm:items-end">
         <div className="flex flex-col gap-1.5"><Label htmlFor="r-from" className="text-xs text-muted-foreground">Từ ngày</Label><Input id="r-from" type="date" value={from} max={to} onChange={(e) => e.target.value && setFrom(e.target.value)} /></div>
         <div className="flex flex-col gap-1.5"><Label htmlFor="r-to" className="text-xs text-muted-foreground">Đến ngày</Label><Input id="r-to" type="date" value={to} min={from} onChange={(e) => e.target.value && setTo(e.target.value)} /></div>
@@ -70,7 +72,7 @@ function Report() {
           </div>
         </div>
       )}
-    </div>
+    </AdminPage>
   )
 }
 

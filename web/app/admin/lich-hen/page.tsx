@@ -1,18 +1,20 @@
 "use client"
 
+import { Search } from "lucide-react"
 import { useState } from "react"
 
 import { AppointmentActions } from "@/components/admin/appointment-actions"
 import { AppointmentDetail } from "@/components/appointment-detail"
 import { ErrorNote } from "@/components/error-note"
+import { AdminPage } from "@/components/layout/admin-page"
+import { PageHeader } from "@/components/layout/page-header"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { api, type Appointment, type AppointmentStatus } from "@/lib/api"
 import { ALL_STATUSES, STATUS_LABEL, formatDate, formatRange } from "@/lib/format"
 import { useApi } from "@/lib/use-api"
@@ -20,36 +22,40 @@ import { useApi } from "@/lib/use-api"
 export default function AdminAppointmentsPage() {
   const [status, setStatus] = useState<AppointmentStatus | "ALL">("ALL")
   const [date, setDate] = useState("")
+  const [q, setQ] = useState("")
   const [open, setOpen] = useState<Appointment | null>(null)
-  const { data, error, loading, reload } = useApi(() => api.appointments({ status: status === "ALL" ? undefined : status, date: date || undefined }), [status, date])
-  const items = (data ?? []).slice().sort((a, b) => (a.slot.slot_date + a.slot.start_time).localeCompare(b.slot.slot_date + b.slot.start_time))
+  // Lấy theo ngày (nếu có), lọc trạng thái và tìm kiếm ở phía client để các tab có số lượng đúng
+  const { data, error, loading, reload } = useApi(() => api.appointments({ date: date || undefined }), [date])
+  const all = data ?? []
+  const counts = (s: AppointmentStatus | "ALL") => (s === "ALL" ? all.length : all.filter((a) => a.status === s).length)
+  const needle = q.trim().toLowerCase()
+  const items = all
+    .filter((a) => status === "ALL" || a.status === status)
+    .filter((a) => !needle || [String(a.appointment_id), a.customer.full_name, a.vehicle.license_plate, a.service.name].some((t) => t.toLowerCase().includes(needle)))
+    .sort((a, b) => (a.slot.slot_date + a.slot.start_time).localeCompare(b.slot.slot_date + b.slot.start_time))
 
-  // làm mới dữ liệu rồi đồng bộ lại lịch đang mở trong ngăn chi tiết
   const afterAction = () => { setOpen(null); reload() }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl">Lịch hẹn</h1>
-        <p className="text-sm text-muted-foreground">{loading ? "Đang tải" : `${items.length} lịch hẹn`}</p>
-      </div>
+    <AdminPage>
+      <PageHeader size="sm" title="Lịch hẹn" description={loading ? "Đang tải" : `${items.length} trên ${all.length} lịch hẹn`} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="f-status" className="text-xs text-muted-foreground">Trạng thái</Label>
-          <Select value={status} onValueChange={(v) => setStatus(v as AppointmentStatus | "ALL")}>
-            <SelectTrigger id="f-status" className="w-full sm:w-48"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Tất cả</SelectItem>
-              {ALL_STATUSES.map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}
-            </SelectContent>
-          </Select>
+      <Tabs value={status} onValueChange={(v) => setStatus(v as AppointmentStatus | "ALL")}>
+        <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
+          <TabsList className="w-max">
+            <TabsTrigger value="ALL">Tất cả <span className="tabular-nums text-muted-foreground">{counts("ALL")}</span></TabsTrigger>
+            {ALL_STATUSES.map((s) => <TabsTrigger key={s} value={s}>{STATUS_LABEL[s]} <span className="tabular-nums text-muted-foreground">{counts(s)}</span></TabsTrigger>)}
+          </TabsList>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="f-date" className="text-xs text-muted-foreground">Ngày</Label>
-          <Input id="f-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full sm:w-44" />
+      </Tabs>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative sm:w-72">
+          <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo mã, khách, biển số, dịch vụ" aria-label="Tìm lịch hẹn" className="pl-8" />
         </div>
-        {(status !== "ALL" || date) && <Button variant="ghost" onClick={() => { setStatus("ALL"); setDate("") }}>Xóa lọc</Button>}
+        <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Lọc theo ngày" className="sm:w-44" />
+        {(date || q) && <Button variant="ghost" onClick={() => { setDate(""); setQ("") }}>Xóa lọc</Button>}
       </div>
 
       <ErrorNote error={error} who="staff" />
@@ -121,6 +127,6 @@ export default function AdminAppointmentsPage() {
           )}
         </SheetContent>
       </Sheet>
-    </div>
+    </AdminPage>
   )
 }

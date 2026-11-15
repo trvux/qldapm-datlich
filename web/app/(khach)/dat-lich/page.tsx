@@ -5,10 +5,11 @@ import { Suspense, useState } from "react"
 import { toast } from "sonner"
 
 import { ErrorNote } from "@/components/error-note"
+import { AppPage } from "@/components/layout/app-page"
+import { PageHeader } from "@/components/layout/page-header"
 import { RequireAuth } from "@/components/shell/require-auth"
 import { SlotPicker } from "@/components/slot-picker"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,13 +23,22 @@ import { useApi } from "@/lib/use-api"
 
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-3" aria-labelledby={`step-${n}`}>
-      <h2 id={`step-${n}`} className="flex items-center gap-2 text-lg">
-        <span className="inline-flex size-6 items-center justify-center rounded-sm bg-primary text-xs font-semibold text-primary-foreground tabular-nums">{n}</span>
+    <section className="flex flex-col gap-4" aria-labelledby={`step-${n}`}>
+      <h2 id={`step-${n}`} className="flex items-center gap-3 text-xl">
+        <span className="inline-flex size-7 items-center justify-center rounded-sm bg-primary font-sans text-sm font-semibold text-primary-foreground tabular-nums">{n}</span>
         {title}
       </h2>
       {children}
     </section>
+  )
+}
+
+function Row({ k, v }: { k: string; v: string | null }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <dt className="text-muted-foreground">{k}</dt>
+      <dd className={v ? "text-right font-medium tabular-nums" : "text-right text-muted-foreground"}>{v ?? "Chưa chọn"}</dd>
+    </div>
   )
 }
 
@@ -37,8 +47,8 @@ function BookingForm() {
   const preset = useSearchParams().get("service")
   const vehicles = useApi(() => api.vehicles(), [])
   const services = useApi(() => api.services(), [])
-  const [vehicleId, setVehicleId] = useState<string>("")
-  const [serviceId, setServiceId] = useState<string>(preset ?? "")
+  const [vehicleId, setVehicleId] = useState("")
+  const [serviceId, setServiceId] = useState(preset ?? "")
   const [slot, setSlot] = useState<Slot | null>(null)
   const [note, setNote] = useState("")
   const [busy, setBusy] = useState(false)
@@ -64,15 +74,16 @@ function BookingForm() {
     }
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl">Đặt lịch</h1>
-        <p className="text-muted-foreground">Chọn xe, dịch vụ và thời gian.</p>
-      </div>
+  const submitButton = (
+    <Button size="lg" disabled={!ready || busy} onClick={submit} className="w-full">{busy && <Spinner />}Đặt lịch</Button>
+  )
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-        <div className="flex min-w-0 flex-col gap-8">
+  return (
+    <AppPage className="pb-28 lg:pb-12">
+      <PageHeader eyebrow="Đặt lịch" title="Đặt lịch bảo dưỡng" description="Chọn xe, dịch vụ và khung giờ. Trung tâm sẽ xác nhận lịch của Quý khách." />
+
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start lg:gap-12">
+        <div className="flex min-w-0 flex-col gap-10">
           <Step n={1} title="Xe">
             <ErrorNote error={vehicles.error} />
             {vehicles.loading ? <Skeleton className="h-10 w-full" /> : (
@@ -93,9 +104,9 @@ function BookingForm() {
           <Step n={2} title="Dịch vụ">
             <ErrorNote error={services.error} />
             {services.loading ? <Skeleton className="h-40 w-full" /> : (
-              <RadioGroup value={serviceId} onValueChange={setServiceId} className="grid gap-2 sm:grid-cols-2">
+              <RadioGroup value={serviceId} onValueChange={setServiceId} className="grid gap-3 sm:grid-cols-2">
                 {(services.data ?? []).map((s) => (
-                  <Label key={s.service_id} htmlFor={`svc-${s.service_id}`} className="flex cursor-pointer items-start gap-3 rounded-md border p-3 font-normal has-data-[state=checked]:border-primary has-data-[state=checked]:bg-accent">
+                  <Label key={s.service_id} htmlFor={`svc-${s.service_id}`} className="flex cursor-pointer items-start gap-3 rounded-md border bg-card p-4 font-normal transition-colors hover:border-primary/60 has-data-[state=checked]:border-primary has-data-[state=checked]:bg-accent">
                     <RadioGroupItem id={`svc-${s.service_id}`} value={String(s.service_id)} className="mt-0.5" />
                     <span className="flex flex-1 flex-col gap-0.5">
                       <span className="font-medium">{s.name}</span>
@@ -110,36 +121,36 @@ function BookingForm() {
           <Step n={3} title="Thời gian"><SlotPicker value={slot?.slot_id ?? null} onChange={setSlot} /></Step>
 
           <Step n={4} title="Ghi chú (không bắt buộc)">
-            <Textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} placeholder="Ví dụ: xe có tiếng kêu ở bánh trước." aria-label="Ghi chú cho Trung tâm" />
+            <Textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={3} placeholder="Ví dụ: xe có tiếng kêu ở bánh trước." aria-label="Ghi chú cho Trung tâm" />
           </Step>
         </div>
 
-        <Card className="lg:sticky lg:top-24">
-          <CardHeader><CardTitle className="text-lg">Tóm tắt</CardTitle></CardHeader>
-          <CardContent className="flex flex-col gap-4 text-sm">
-            <dl className="flex flex-col gap-2.5">
-              <Row k="Xe" v={vehicle ? `${vehicle.license_plate}` : null} />
-              <Row k="Dịch vụ" v={service?.name ?? null} />
-              <Row k="Ngày" v={slot ? formatDate(slot.slot_date) : null} />
-              <Row k="Giờ" v={slot ? formatRange(slot.start_time, slot.end_time) : null} />
-              <Row k="Giá tham khảo" v={service ? formatVND(service.reference_price) : null} />
-            </dl>
-            <ErrorNote error={error} />
-            <Button size="lg" disabled={!ready || busy} onClick={submit}>{busy && <Spinner />}Đặt lịch</Button>
-            {!ready && <p className="text-xs text-muted-foreground">Chọn đủ xe, dịch vụ và khung giờ để đặt lịch.</p>}
-          </CardContent>
-        </Card>
+        {/* Tóm tắt: cột phải, dính khi cuộn (desktop). Trên mobile thay bằng thanh đặt lịch cố định ở đáy. */}
+        <aside className="stitch hidden flex-col gap-5 rounded-lg border bg-card p-6 lg:sticky lg:top-24 lg:flex">
+          <h2 className="text-lg">Tóm tắt</h2>
+          <dl className="flex flex-col gap-3 text-sm">
+            <Row k="Xe" v={vehicle?.license_plate ?? null} />
+            <Row k="Dịch vụ" v={service?.name ?? null} />
+            <Row k="Ngày" v={slot ? formatDate(slot.slot_date) : null} />
+            <Row k="Giờ" v={slot ? formatRange(slot.start_time, slot.end_time) : null} />
+            <Row k="Giá tham khảo" v={service ? formatVND(service.reference_price) : null} />
+          </dl>
+          <ErrorNote error={error} />
+          {submitButton}
+          {!ready && <p className="text-xs text-muted-foreground">Chọn đủ xe, dịch vụ và khung giờ để đặt lịch.</p>}
+        </aside>
       </div>
-    </div>
-  )
-}
 
-function Row({ k, v }: { k: string; v: string | null }) {
-  return (
-    <div className="flex justify-between gap-4">
-      <dt className="text-muted-foreground">{k}</dt>
-      <dd className={v ? "text-right font-medium tabular-nums" : "text-right text-muted-foreground"}>{v ?? "Chưa chọn"}</dd>
-    </div>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 p-3 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-1">
+          <div className="min-w-0 flex-1 text-sm">
+            <p className="truncate font-medium">{service?.name ?? "Chưa chọn dịch vụ"}</p>
+            <p className="truncate text-xs text-muted-foreground tabular-nums">{slot ? `${formatDate(slot.slot_date)} · ${formatRange(slot.start_time, slot.end_time)}` : "Chưa chọn thời gian"}</p>
+          </div>
+          <div className="w-32 shrink-0">{submitButton}</div>
+        </div>
+      </div>
+    </AppPage>
   )
 }
 

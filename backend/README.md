@@ -40,6 +40,7 @@ Mở Swagger UI: http://localhost:8000/docs · Kiểm tra sống: http://localho
 
 Dựng lại CSDL từ đầu (mất hết dữ liệu): `docker compose down -v && docker compose up -d`.
 Sinh thêm khung giờ cho các ngày mới: `docker exec -i datlich-postgres psql -U datlich -d datlich < db/slots.sql`.
+CSDL đã nạp `seed.sql` bản cũ (tên không dấu): chạy `docker exec -i datlich-postgres psql -U datlich -d datlich < db/fix_diacritics.sql` để đổi sang tên có dấu (chạy lại nhiều lần vẫn an toàn).
 
 ## Tài khoản demo
 

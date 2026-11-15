@@ -65,7 +65,7 @@ def test_booking_success(customer1, vehicle_ids, open_slots):
     assert a["status"] == "PENDING"  # BR14
     assert a["note"] == "Kêu lạ ở bánh trước"  # đã cắt khoảng trắng
     assert a["handled_by"] is None and a["reject_reason"] is None and a["change_count"] == 0
-    assert a["customer"]["full_name"] == "Pham Minh Khach"
+    assert a["customer"]["full_name"] == "Phạm Minh Khách"
     assert a["service"]["service_id"] == 2 and a["service"]["reference_price"] == 550000
     assert a["slot"]["slot_id"] == s["slot_id"]
     assert a["created_at"].endswith("+07:00")  # BR25

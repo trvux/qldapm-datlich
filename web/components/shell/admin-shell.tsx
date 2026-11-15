@@ -93,7 +93,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <UserMenu area="admin" />
             </div>
           </header>
-          <div className="flex-1 p-3 sm:p-4 lg:p-6">{children}</div>
+          <div className="flex-1 p-4 sm:p-6 lg:p-8">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </div>

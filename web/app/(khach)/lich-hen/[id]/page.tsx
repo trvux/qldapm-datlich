@@ -6,13 +6,14 @@ import { useParams } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { AppointmentDetail } from "@/components/appointment-detail"
+import { AppointmentHistory, AppointmentInfo } from "@/components/appointment-detail"
+import { AppPage } from "@/components/layout/app-page"
+import { PageHeader } from "@/components/layout/page-header"
 import { ErrorNote } from "@/components/error-note"
 import { RequireAuth } from "@/components/shell/require-auth"
 import { SlotPicker } from "@/components/slot-picker"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
@@ -93,23 +94,29 @@ function Detail() {
   const { data, error, loading, reload } = useApi(() => api.appointment(Number(id)), [id])
   const canChange = data && (data.status === "PENDING" || data.status === "CONFIRMED")
   return (
-    <div className="flex flex-col gap-6">
-      <Button asChild variant="ghost" className="self-start px-2"><Link href="/lich-hen"><ArrowLeft className="size-4" />Lịch hẹn</Link></Button>
+    <AppPage>
+      <PageHeader
+        eyebrow="Lịch hẹn"
+        title={data ? `Lịch hẹn #${data.appointment_id}` : "Lịch hẹn"}
+        description={data ? `${data.service.name} · ${data.vehicle.license_plate}` : undefined}
+        actions={<Button asChild variant="outline"><Link href="/lich-hen"><ArrowLeft className="size-4" />Tất cả lịch hẹn</Link></Button>}
+      />
       <ErrorNote error={error} />
-      {loading ? <Skeleton className="h-72 w-full max-w-2xl" /> : data && (
-        <Card className="max-w-2xl">
-          <CardContent className="flex flex-col gap-6">
-            <AppointmentDetail a={data} />
+      {loading ? <Skeleton className="h-72 w-full" /> : data && (
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+          <div className="flex flex-col gap-6 rounded-lg border bg-card p-6 lg:col-span-7">
+            <AppointmentInfo a={data} />
             {canChange && (
-              <div className="flex flex-wrap gap-2 border-t pt-4">
+              <div className="flex flex-wrap gap-2 border-t pt-5">
                 <Reschedule a={data} onDone={reload} />
                 <Cancel a={data} onDone={reload} />
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+          <div className="rounded-lg border bg-card p-6 lg:col-span-5"><AppointmentHistory a={data} /></div>
+        </div>
       )}
-    </div>
+    </AppPage>
   )
 }
 

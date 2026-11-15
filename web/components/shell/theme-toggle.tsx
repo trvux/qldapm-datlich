@@ -16,11 +16,11 @@ export function ThemeToggle() {
           <Moon className="hidden size-4 dark:block" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="min-w-44">
         <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-          <DropdownMenuRadioItem value="light"><Sun className="size-4" />Sáng</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="dark"><Moon className="size-4" />Tối</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="system"><Monitor className="size-4" />Theo hệ thống</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="light" className="whitespace-nowrap"><Sun className="size-4" />Sáng</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark" className="whitespace-nowrap"><Moon className="size-4" />Tối</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="system" className="whitespace-nowrap"><Monitor className="size-4" />Theo hệ thống</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

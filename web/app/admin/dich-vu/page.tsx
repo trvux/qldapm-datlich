@@ -5,6 +5,8 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { ErrorNote } from "@/components/error-note"
+import { AdminPage } from "@/components/layout/admin-page"
+import { PageHeader } from "@/components/layout/page-header"
 import { RequireManager } from "@/components/shell/admin-shell"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -79,11 +81,8 @@ function Services() {
   }
   const items = data ?? []
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1"><h1 className="text-2xl">Dịch vụ</h1><p className="text-sm text-muted-foreground">{loading ? "Đang tải" : `${items.length} dịch vụ`}</p></div>
-        <Button onClick={() => edit(null)}><Plus className="size-4" />Thêm dịch vụ</Button>
-      </div>
+    <AdminPage>
+      <PageHeader size="sm" title="Dịch vụ" description={loading ? "Đang tải" : `${items.length} dịch vụ`} actions={<Button onClick={() => edit(null)}><Plus className="size-4" />Thêm dịch vụ</Button>} />
       <ErrorNote error={error} who="staff" />
       {loading ? <div className="flex flex-col gap-2">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-12" />)}</div> : (
         <>
@@ -118,7 +117,7 @@ function Services() {
         </>
       )}
       <ServiceDialog service={editing} open={open} onOpenChange={setOpen} onSaved={reload} />
-    </div>
+    </AdminPage>
   )
 }
 

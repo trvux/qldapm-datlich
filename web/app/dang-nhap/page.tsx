@@ -5,13 +5,16 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 import { toast } from "sonner"
 
+import Image from "next/image"
+
 import { LogoCompact } from "@/components/brand/logo"
+import { Chequy } from "@/components/brand/motifs"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { ApiError, errorText } from "@/lib/api"
+import { PHOTOS } from "@/lib/photos"
 import { isStaffRole, useAuth } from "@/lib/auth"
 
 const DEMO = [
@@ -51,46 +54,56 @@ function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="text-xl">Đăng nhập</CardTitle>
-        <CardDescription>Dùng tài khoản của Trung tâm Dịch vụ Ô tô XYZ.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!error} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Mật khẩu</Label>
-            <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} aria-invalid={!!error} />
-          </div>
-          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={busy || !email || !password}>
-            {busy && <Spinner />}Đăng nhập
-          </Button>
-        </form>
-        <div className="mt-6 border-t pt-4">
-          <p className="mb-2 text-xs text-muted-foreground">Tài khoản demo (điền nhanh)</p>
-          <div className="flex flex-wrap gap-2">
-            {DEMO.map((d) => (
-              <Button key={d.label} type="button" variant="outline" size="sm" onClick={() => { setEmail(d.email); setPassword(d.password) }}>
-                {d.label}
-              </Button>
-            ))}
-          </div>
+    <div className="flex w-full max-w-sm flex-col gap-8">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl">Đăng nhập</h1>
+        <p className="text-muted-foreground">Dùng tài khoản của Marque để đặt lịch và theo dõi lịch hẹn.</p>
+      </div>
+      <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!error} />
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="password">Mật khẩu</Label>
+          <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} aria-invalid={!!error} />
+        </div>
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" size="lg" disabled={busy || !email || !password}>
+          {busy && <Spinner />}Đăng nhập
+        </Button>
+      </form>
+      <div className="flex flex-col gap-2 border-t pt-5">
+        <p className="text-xs text-muted-foreground">Tài khoản demo (điền nhanh)</p>
+        <div className="flex flex-wrap gap-2">
+          {DEMO.map((d) => (
+            <Button key={d.label} type="button" variant="outline" size="sm" onClick={() => { setEmail(d.email); setPassword(d.password) }}>
+              {d.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 px-4 py-10">
-      <Link href="/" aria-label="Marque, trang chủ" className="text-primary"><LogoCompact className="h-12" /></Link>
-      <Suspense><LoginForm /></Suspense>
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <aside className="relative hidden flex-col justify-between overflow-hidden bg-band p-10 text-band-foreground lg:flex">
+        <Image src={PHOTOS.hero.src} alt={PHOTOS.hero.alt} fill priority sizes="50vw" className="object-cover opacity-45 mix-blend-luminosity" style={{ objectPosition: "70% 60%" }} />
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-band/85 via-band/40 to-band/90" />
+        <Link href="/" aria-label="Marque, trang chủ" className="relative"><LogoCompact className="h-12 text-band-foreground" /></Link>
+        <div className="relative flex max-w-md flex-col gap-3">
+          <p className="font-heading text-3xl leading-snug font-semibold text-balance">Bảo dưỡng xe đúng giờ, đúng cách.</p>
+          <p className="text-sm text-band-foreground/80">Đặt lịch, đổi lịch và theo dõi trạng thái ngay trên trang.</p>
+        </div>
+        <Chequy size={8} className="absolute inset-x-0 bottom-0 text-band-foreground/90" />
+      </aside>
+      <main className="flex flex-col px-6 py-8 sm:px-10">
+        <Link href="/" aria-label="Marque, trang chủ" className="text-primary lg:hidden"><LogoCompact className="h-10" /></Link>
+        <div className="flex flex-1 items-center justify-center py-10"><Suspense><LoginForm /></Suspense></div>
+      </main>
     </div>
   )
 }

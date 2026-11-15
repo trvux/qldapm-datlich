@@ -45,11 +45,25 @@ app/(khach)/       Khu khách (header ngang, menu dạng ngăn kéo trên mobile
 app/admin/         Khu admin (thanh bên, thu thành ngăn kéo trên mobile)
 app/globals.css    Toàn bộ token thương hiệu (màu, radius, mật độ, chuyển động)
 components/ui/     Component shadcn (đã chỉnh theo thương hiệu)
-components/brand/  Logo và minh họa
-components/shell/  Header, thanh bên, đăng nhập
+components/layout/ Khung dùng chung: Container, PageHeader, Section, AppPage, AdminPage
+components/brand/  Logo, minh họa và mô-típ (motifs.tsx: dải ô cờ, sọc đôi, khung khiên, biển số)
+components/shell/  Header, footer, thanh bên, đăng nhập
+components/landing/ Các khối của trang chủ (dịch vụ, hỏi đáp)
 lib/api.ts         Gọi API, kiểu dữ liệu, thông báo lỗi
 lib/auth.tsx       Phiên đăng nhập (token trong localStorage)
+lib/policy.ts      Quy định đặt lịch hiển thị cho khách (giá trị mặc định của Backend; TODO: lấy từ API)
+lib/photos.ts      Ảnh minh họa và alt
+public/images/     Ảnh Unsplash đã nén; nguồn và tác giả trong CREDITS.md
+app/*-icon, favicon.ico, opengraph-image.png, manifest.ts   Icon, ảnh OG, PWA
 ```
+
+## Quy tắc layout
+
+Mọi trang dùng chung một khung để không lệch trái, giữa, phải:
+
+- Khu khách: `Container` (một bề rộng cho header, nội dung, footer); trang app bọc bằng `AppPage`, mục landing bằng `Section` (nhịp dọc `py-16`, `md:py-24`). Khu admin: `AdminPage`.
+- Đầu trang luôn là `PageHeader`: tiêu đề và mô tả **căn trái**, nút hành động chính **góc phải** từ `sm` (xếp dưới, full-width trên mobile).
+- Mọi chữ căn trái. Chỉ căn giữa ở khối đăng nhập và trạng thái trống; số trong bảng căn phải.
 
 ## Thương hiệu
 
