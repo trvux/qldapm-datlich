@@ -1,4 +1,4 @@
-import { Geist_Mono, Inter, Noto_Serif } from "next/font/google"
+import { Inter, Noto_Serif } from "next/font/google"
 
 import type { Metadata, Viewport } from "next"
 
@@ -13,11 +13,6 @@ import { cn } from "@/lib/utils";
 const notoSerifHeading = Noto_Serif({subsets:['latin'],variable:'--font-heading'});
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 
@@ -46,7 +41,7 @@ export default function RootLayout({
     <html
       lang="vi"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable, notoSerifHeading.variable)}
+      className={cn("antialiased", "font-sans", inter.variable, notoSerifHeading.variable)}
     >
       <body>
         <BrandDefs />

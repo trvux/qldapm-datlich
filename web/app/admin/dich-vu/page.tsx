@@ -90,7 +90,7 @@ function Services() {
             {items.map((s) => (
               <li key={s.service_id} className="flex flex-col gap-2 rounded-lg border bg-card p-3">
                 <div className="flex items-start justify-between gap-2"><span className="font-medium">{s.name}</span>{s.is_active === false && <Badge variant="cancelled">Ngừng</Badge>}</div>
-                <span className="text-xs text-muted-foreground tabular-nums">{s.duration_minutes} phút · {formatVND(s.reference_price)}</span>
+                <span className="text-xs text-muted-foreground">{s.duration_minutes} phút · {formatVND(s.reference_price)}</span>
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 text-sm"><Switch checked={s.is_active !== false} onCheckedChange={(v) => toggle(s, v)} aria-label={`Bật dịch vụ ${s.name}`} />Đang hoạt động</label>
                   <Button size="sm" variant="outline" onClick={() => edit(s)}><Pencil className="size-4" />Sửa</Button>
@@ -105,8 +105,8 @@ function Services() {
                 {items.map((s) => (
                   <TableRow key={s.service_id}>
                     <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell className="tabular-nums">{s.duration_minutes} phút</TableCell>
-                    <TableCell className="tabular-nums">{formatVND(s.reference_price)}</TableCell>
+                    <TableCell className="">{s.duration_minutes} phút</TableCell>
+                    <TableCell className="">{formatVND(s.reference_price)}</TableCell>
                     <TableCell><Switch checked={s.is_active !== false} onCheckedChange={(v) => toggle(s, v)} aria-label={`Bật dịch vụ ${s.name}`} /></TableCell>
                     <TableCell className="text-right"><Button size="sm" variant="outline" onClick={() => edit(s)}><Pencil className="size-4" />Sửa</Button></TableCell>
                   </TableRow>

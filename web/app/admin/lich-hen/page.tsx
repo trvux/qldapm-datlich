@@ -44,8 +44,8 @@ export default function AdminAppointmentsPage() {
       <Tabs value={status} onValueChange={(v) => setStatus(v as AppointmentStatus | "ALL")}>
         <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
           <TabsList className="w-max">
-            <TabsTrigger value="ALL">Tất cả <span className="tabular-nums text-muted-foreground">{counts("ALL")}</span></TabsTrigger>
-            {ALL_STATUSES.map((s) => <TabsTrigger key={s} value={s}>{STATUS_LABEL[s]} <span className="tabular-nums text-muted-foreground">{counts(s)}</span></TabsTrigger>)}
+            <TabsTrigger value="ALL">Tất cả <span className="text-muted-foreground">{counts("ALL")}</span></TabsTrigger>
+            {ALL_STATUSES.map((s) => <TabsTrigger key={s} value={s}>{STATUS_LABEL[s]} <span className="text-muted-foreground">{counts(s)}</span></TabsTrigger>)}
           </TabsList>
         </div>
       </Tabs>
@@ -72,11 +72,11 @@ export default function AdminAppointmentsPage() {
               <li key={a.appointment_id} className="flex flex-col gap-2 rounded-lg border bg-card p-3">
                 <button type="button" className="flex flex-col gap-1.5 text-left" onClick={() => setOpen(a)}>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium tabular-nums">#{a.appointment_id} · {a.service.name}</span>
+                    <span className="font-medium">#{a.appointment_id} · {a.service.name}</span>
                     <StatusBadge status={a.status} />
                   </div>
-                  <span className="text-xs text-muted-foreground tabular-nums">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</span>
-                  <span className="text-xs text-muted-foreground">{a.customer.full_name} · <span className="tabular-nums">{a.vehicle.license_plate}</span></span>
+                  <span className="text-xs text-muted-foreground">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</span>
+                  <span className="text-xs text-muted-foreground">{a.customer.full_name} · <span className="">{a.vehicle.license_plate}</span></span>
                 </button>
                 <AppointmentActions a={a} onDone={reload} />
               </li>
@@ -99,10 +99,10 @@ export default function AdminAppointmentsPage() {
               <TableBody>
                 {items.map((a) => (
                   <TableRow key={a.appointment_id}>
-                    <TableCell className="tabular-nums"><button type="button" onClick={() => setOpen(a)} className="font-medium text-primary underline-offset-4 hover:underline">#{a.appointment_id}</button></TableCell>
-                    <TableCell className="tabular-nums">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</TableCell>
+                    <TableCell className=""><button type="button" onClick={() => setOpen(a)} className="font-medium text-primary underline-offset-4 hover:underline">#{a.appointment_id}</button></TableCell>
+                    <TableCell className="">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</TableCell>
                     <TableCell>{a.customer.full_name}</TableCell>
-                    <TableCell className="tabular-nums">{a.vehicle.license_plate}</TableCell>
+                    <TableCell className="">{a.vehicle.license_plate}</TableCell>
                     <TableCell>{a.service.name}</TableCell>
                     <TableCell><StatusBadge status={a.status} /></TableCell>
                     <TableCell className="text-right"><div className="flex justify-end"><AppointmentActions a={a} onDone={reload} /></div></TableCell>

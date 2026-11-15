@@ -23,9 +23,9 @@ function NextAppointment({ a }: { a: Appointment }) {
   return (
     <section aria-label="Lịch sắp tới" className="stitch flex flex-col gap-5 rounded-lg bg-band p-6 text-band-foreground sm:flex-row sm:items-center sm:justify-between sm:p-8">
       <div className="flex min-w-0 flex-col gap-2">
-        <p className="text-xs tracking-[0.18em] uppercase opacity-80">Lịch sắp tới</p>
-        <p className="font-heading text-2xl font-semibold tabular-nums sm:text-3xl">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</p>
-        <p className="text-sm opacity-90">{a.service.name} · <span className="tabular-nums">{a.vehicle.license_plate}</span></p>
+        <p className="text-xs font-semibold tracking-[0.08em] uppercase opacity-90">Lịch sắp tới</p>
+        <p className="font-heading text-2xl font-semibold sm:text-3xl">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</p>
+        <p className="text-sm opacity-90">{a.service.name} · <span className="">{a.vehicle.license_plate}</span></p>
         <div className="pt-1"><StatusBadge status={a.status} /></div>
       </div>
       <Button asChild variant="secondary" size="lg"><Link href={`/lich-hen/${a.appointment_id}`}>Xem chi tiết <ArrowRight className="size-4" /></Link></Button>

@@ -26,7 +26,7 @@ export default function ServicesPage() {
       />
       <BrandPhoto src={PHOTOS.gauges.src} alt={PHOTOS.gauges.alt} priority sizes="(min-width: 1152px) 1088px, 100vw" position="center 52%" className="h-56 rounded-lg border sm:h-72 lg:h-80" />
       <ErrorNote error={error} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="cards-center">
         {loading
           ? Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-52" />)
           : (data ?? []).map((s, i) => <ServiceCard key={s.service_id} service={s} index={i} scaleMinutes={longestDuration(data ?? [])} />)}

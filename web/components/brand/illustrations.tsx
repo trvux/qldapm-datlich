@@ -141,14 +141,13 @@ const ROAD_ROWS = [
   { y: 147, h: 8, c: 15, o: 0.95, v: 112 },
 ]
 /**
- * Gió: đường kẻ mảnh màu trung tính ấm của thương hiệu (không phải xanh), vẽ ra từ phải sang trái rồi bị xóa dần từ đầu phải
- * (nét kéo dài ra trước, đuôi rút theo sau), cuối đường có một vòng xoáy nhỏ, như gió trong tranh minh họa. Thỉnh thoảng mới có;
- * độ dài, độ cao và chu kỳ khác nhau nên không đều như máy.
+ * Gió: vệt khí kéo ra từ đuôi xe (slipstream), không lơ lửng trên trời. Mỗi vệt mọc ra ngay mặt sau của xe, dài dần rồi trượt về sau
+ * và thu nhỏ, mờ dần từ sát xe sang trong suốt. Độ cao nằm trong chiều cao thân xe (tính từ đỉnh mặt sau), độ dài và chu kỳ khác nhau.
  */
 const WIND = [
-  { x: 380, y: 14, len: 150, dur: 4.2, delay: 0.3 },
-  { x: 372, y: 30, len: 104, dur: 5.1, delay: 1.9 },
-  { x: 384, y: 46, len: 128, dur: 4.7, delay: 3.4 },
+  { dy: 10, len: 92, dur: 3.1, delay: 0.2 },
+  { dy: 24, len: 64, dur: 3.7, delay: 1.3 },
+  { dy: 38, len: 80, dur: 3.4, delay: 2.2 },
 ]
 
 /** Tốc độ lăn của bánh = tốc độ hàng đường sát bánh (đơn vị/giây), nên bánh bán kính r quay một vòng trong 2 * pi * r / v giây. */
@@ -160,6 +159,10 @@ export function VehicleSilhouette({ body, className }: { body: BodyType; classNa
   const wheels: [number, number] = spec?.wheels ?? [105, 295]
   const r = spec?.r ?? 26
   const yc = spec?.yc ?? 112
+  const dBody = (spec ? spec.d : HAND[body]?.body) ?? ""
+  const rear = dBody.match(/^M([\d.]+) [\d.]+ L[\d.]+ ([\d.]+)/)
+  const rearX = rear ? Number(rear[1]) : 40
+  const rearTop = rear ? Number(rear[2]) : 80
   return (
     <svg viewBox="8 2 384 154" aria-hidden="true" className={cn("w-full", className)}>
       <defs>
@@ -186,6 +189,10 @@ export function VehicleSilhouette({ body, className }: { body: BodyType; classNa
           <stop offset=".8" stopColor="#fff" />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
+        <linearGradient id="marque-wind" x1="1" x2="0" y1="0" y2="0">
+          <stop offset="0" style={{ stopColor: "var(--muted-foreground)", stopOpacity: 0.55 }} />
+          <stop offset="1" style={{ stopColor: "var(--muted-foreground)", stopOpacity: 0 }} />
+        </linearGradient>
         <mask id="marque-road-mask" maskUnits="userSpaceOnUse" x="8" y="136" width="384" height="22">
           <rect x="8" y="136" width="384" height="22" fill="url(#marque-road-fade)" />
         </mask>
@@ -203,23 +210,26 @@ export function VehicleSilhouette({ body, className }: { body: BodyType; classNa
           </g>
         ))}
       </g>
-      {/* Gió: vẽ sau thân xe nên lướt ngang qua phía sau xe */}
-      <g aria-hidden>
-        {WIND.map((w, i) => (
-          <path
-            key={i}
-            className="car-wind"
-            pathLength={1}
-            d={`M${w.x} ${w.y} H${w.x - w.len + 12} C${w.x - w.len + 5} ${w.y} ${w.x - w.len} ${w.y - 5} ${w.x - w.len + 4} ${w.y - 8} C${w.x - w.len + 8} ${w.y - 10.5} ${w.x - w.len + 13} ${w.y - 6} ${w.x - w.len + 9} ${w.y - 3.5}`}
-            fill="none"
-            stroke="var(--muted-foreground)"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            style={{ "--wd": `${w.dur}s`, "--wl": `${w.delay}s` } as React.CSSProperties}
-          />
-        ))}
-      </g>
       <g className="car-drive">
+        {/* Gió: vệt khí mọc ra từ mặt sau của xe rồi trượt về sau và mờ dần */}
+        <g aria-hidden>
+          {WIND.map((w, i) => {
+            const y = Math.min(rearTop + w.dy, yc - 10)
+            return (
+              <rect
+                key={i}
+                className="car-wind"
+                x={rearX - w.len}
+                y={y}
+                width={w.len}
+                height={2.2}
+                rx={1.1}
+                fill="url(#marque-wind)"
+                style={{ "--wd": `${w.dur}s`, "--wl": `${w.delay}s` } as React.CSSProperties}
+              />
+            )
+          })}
+        </g>
         <g className="car-body">
           {/* Thân xe: chuyển sắc đậm nhạt theo chiều cao (sáng ở nóc, tối ở gầm), thêm viền sáng mảnh ở mép trên để lộ khối */}
           <path d={spec ? spec.d : HAND[body]?.body} fill="url(#marque-body)" stroke={B(300)} strokeWidth={1.6} strokeOpacity={0.5} strokeLinejoin="round" />

@@ -17,8 +17,8 @@ export function AppointmentList({ items }: { items: Appointment[] }) {
                 <span className="font-medium">{a.service.name}</span>
                 <StatusBadge status={a.status} />
               </div>
-              <p className="text-sm text-muted-foreground tabular-nums">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</p>
-              <p className="text-sm text-muted-foreground tabular-nums">{a.vehicle.license_plate} · Mã #{a.appointment_id}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</p>
+              <p className="text-sm text-muted-foreground">{a.vehicle.license_plate} · Mã #{a.appointment_id}</p>
             </Link>
           </li>
         ))}
@@ -37,10 +37,10 @@ export function AppointmentList({ items }: { items: Appointment[] }) {
           <TableBody>
             {items.map((a) => (
               <TableRow key={a.appointment_id} className="cursor-pointer">
-                <TableCell className="tabular-nums"><Link href={`/lich-hen/${a.appointment_id}`} className="font-medium text-primary underline-offset-4 hover:underline">#{a.appointment_id}</Link></TableCell>
+                <TableCell className=""><Link href={`/lich-hen/${a.appointment_id}`} className="font-medium text-primary underline-offset-4 hover:underline">#{a.appointment_id}</Link></TableCell>
                 <TableCell>{a.service.name}</TableCell>
-                <TableCell className="tabular-nums">{a.vehicle.license_plate}</TableCell>
-                <TableCell className="tabular-nums">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</TableCell>
+                <TableCell className="">{a.vehicle.license_plate}</TableCell>
+                <TableCell className="">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</TableCell>
                 <TableCell><StatusBadge status={a.status} /></TableCell>
               </TableRow>
             ))}

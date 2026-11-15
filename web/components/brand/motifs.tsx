@@ -32,7 +32,7 @@ export function StripeRule({ className }: { className?: string }) {
 /** Nhãn nhỏ phía trên tiêu đề, mở đầu bằng ba ô cờ. */
 export function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className={cn("flex items-center gap-2.5 text-xs font-medium tracking-[0.18em] text-primary uppercase", className)}>
+    <p className={cn("flex items-center gap-2.5 text-xs font-semibold tracking-[0.08em] text-primary uppercase", className)}>
       <Chequy size={4} className="w-6 shrink-0" />
       {children}
     </p>
@@ -57,7 +57,7 @@ export function ShieldFrame({
 /** Biển số xe: khung kép, chữ serif. */
 export function PlateBadge({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center rounded-md border-2 border-foreground/80 bg-card p-0.5 font-heading text-base font-semibold tracking-wider tabular-nums", className)}>
+    <span className={cn("inline-flex items-center rounded-md border-2 border-foreground/80 bg-card p-0.5 font-heading text-base font-semibold tracking-wider", className)}>
       <span className="rounded-[4px] border border-border px-2.5 py-0.5">{children}</span>
     </span>
   )

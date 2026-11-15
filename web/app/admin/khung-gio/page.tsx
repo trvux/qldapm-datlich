@@ -29,7 +29,7 @@ function CapacityEditor({ slot, onSaved }: { slot: Slot; onSaved: () => void }) 
   }
   return (
     <div className="flex items-center gap-2">
-      <Input type="number" inputMode="numeric" min={0} value={value} onChange={(e) => setValue(e.target.value)} className="w-20 tabular-nums" aria-label={`Số xe tối đa, ${formatRange(slot.start_time, slot.end_time)}`} />
+      <Input type="number" inputMode="numeric" min={0} value={value} onChange={(e) => setValue(e.target.value)} className="w-20" aria-label={`Số xe tối đa, ${formatRange(slot.start_time, slot.end_time)}`} />
       <Button size="sm" variant="outline" disabled={!changed || busy || value === ""} onClick={save}>Lưu</Button>
     </div>
   )
@@ -57,15 +57,15 @@ function Slots() {
         <>
           <Tabs value={day} onValueChange={setPicked}>
             <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
-              <TabsList className="w-max">{dates.map((d) => <TabsTrigger key={d} value={d} className="tabular-nums">{formatShortDate(d)}</TabsTrigger>)}</TabsList>
+              <TabsList className="w-max">{dates.map((d) => <TabsTrigger key={d} value={d} className="">{formatShortDate(d)}</TabsTrigger>)}</TabsList>
             </div>
           </Tabs>
-          <h2 className="text-lg tabular-nums">{formatDate(day)}</h2>
+          <h2 className="text-lg">{formatDate(day)}</h2>
           <ul className="flex flex-col gap-2 md:hidden">
             {slots.map((s) => (
               <li key={s.slot_id} className="flex flex-col gap-2 rounded-lg border bg-card p-3">
-                <div className="flex items-center justify-between gap-2"><span className="font-medium tabular-nums">{formatRange(s.start_time, s.end_time)}</span>{!s.bookable && <Badge variant="cancelled">{slotClosedLabel(s.closed_reason)}</Badge>}</div>
-                <span className="text-xs text-muted-foreground tabular-nums">Đã đặt {s.booked} · Còn {s.remaining}</span>
+                <div className="flex items-center justify-between gap-2"><span className="font-medium">{formatRange(s.start_time, s.end_time)}</span>{!s.bookable && <Badge variant="cancelled">{slotClosedLabel(s.closed_reason)}</Badge>}</div>
+                <span className="text-xs text-muted-foreground">Đã đặt {s.booked} · Còn {s.remaining}</span>
                 <CapacityEditor slot={s} onSaved={reload} />
               </li>
             ))}
@@ -76,9 +76,9 @@ function Slots() {
               <TableBody>
                 {slots.map((s) => (
                   <TableRow key={s.slot_id}>
-                    <TableCell className="font-medium tabular-nums">{formatRange(s.start_time, s.end_time)}</TableCell>
-                    <TableCell className="tabular-nums">{s.booked}</TableCell>
-                    <TableCell className="tabular-nums">{s.remaining}</TableCell>
+                    <TableCell className="font-medium">{formatRange(s.start_time, s.end_time)}</TableCell>
+                    <TableCell className="">{s.booked}</TableCell>
+                    <TableCell className="">{s.remaining}</TableCell>
                     <TableCell>{s.bookable ? <Badge variant="confirmed">Còn chỗ</Badge> : <Badge variant="cancelled">{slotClosedLabel(s.closed_reason)}</Badge>}</TableCell>
                     <TableCell><CapacityEditor slot={s} onSaved={reload} /></TableCell>
                   </TableRow>

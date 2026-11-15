@@ -55,7 +55,7 @@ export default function HomePage() {
           <div className="relative mx-auto w-full max-w-md lg:col-span-6 lg:max-w-none">
             <ShieldFrame src={PHOTOS.hero.src} alt={PHOTOS.hero.alt} priority sizes="(min-width: 1024px) 560px, 90vw" position="68% 60%" className="mx-auto max-w-[26rem] lg:ml-auto lg:mr-0 lg:max-w-[28rem]" />
             <div className="absolute bottom-6 left-0 flex max-w-[16rem] flex-col gap-2 rounded-lg border bg-card p-3.5 shadow-none sm:left-4 lg:-left-2">
-              <span className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Ví dụ lịch hẹn</span>
+              <span className="text-[11px] font-semibold tracking-[0.06em] text-muted-foreground uppercase">Ví dụ lịch hẹn</span>
               <span className="text-sm font-medium">Thay dầu động cơ · 09:00</span>
               <StatusBadge status="CONFIRMED" />
             </div>
@@ -134,28 +134,21 @@ export default function HomePage() {
       </Section>
 
       {/* Hỏi đáp */}
-      <Section id="hoi-dap">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-          <div className="flex flex-col items-start gap-4 lg:col-span-4">
-            <Eyebrow>Hỏi đáp</Eyebrow>
-            <h2 className="text-3xl sm:text-4xl">Câu hỏi thường gặp</h2>
-            <p className="text-muted-foreground">Các quy định đặt lịch, đổi lịch và thanh toán, ngắn gọn.</p>
-            <Button asChild variant="outline"><Link href="/dat-lich">Đặt lịch ngay</Link></Button>
-          </div>
-          <div className="lg:col-span-8"><Faq /></div>
+      <Section id="hoi-dap" eyebrow="Hỏi đáp" title="Câu hỏi thường gặp" description="Các quy định đặt lịch, đổi lịch và thanh toán, ngắn gọn.">
+        <div className="mx-auto flex max-w-3xl flex-col gap-8">
+          <Faq />
+          <div className="flex justify-center"><Button asChild variant="outline"><Link href="/dat-lich">Đặt lịch ngay</Link></Button></div>
         </div>
       </Section>
 
       {/* Kêu gọi */}
       <Section tone="brand" className="py-14 md:py-20">
-        <div className="grid items-center gap-8 md:grid-cols-12">
-          <div className="flex flex-col gap-3 md:col-span-8">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="flex flex-col items-center gap-3">
             <h2 className="text-3xl sm:text-4xl">Sẵn sàng cho lần bảo dưỡng tiếp theo?</h2>
             <CtaLead />
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row md:col-span-4 md:justify-end">
-            <Button asChild size="lg" className="bg-band-foreground text-band hover:bg-band-foreground/90"><Link href="/dat-lich">Đặt lịch</Link></Button>
-          </div>
+          <Button asChild size="lg" className="bg-band-foreground text-band hover:bg-band-foreground/90"><Link href="/dat-lich">Đặt lịch</Link></Button>
         </div>
       </Section>
     </>
