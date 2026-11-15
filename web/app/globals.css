@@ -1,0 +1,236 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Marque: DNA thương hiệu nằm hoàn toàn trong tệp này.
+ * Xanh đua (BRG) #1F4D3A = bậc 600. Neutral ấm (hue ~100, chroma thấp), không dùng xám thuần.
+ * Hình khối phẳng: radius ~6px, border 1px, không shadow.
+ * Hai mật độ: mặc định "Vừa" (khách), thêm class .density-compact cho khu nhân viên.
+ */
+
+:root {
+    /* Thang xanh đua, khai báo thẳng ở :root rồi ánh xạ qua @theme inline bên dưới */
+    --brand-50: oklch(0.975 0.006 163.9);
+    --brand-100: oklch(0.945 0.012 163.9);
+    --brand-200: oklch(0.895 0.024 163.9);
+    --brand-300: oklch(0.82 0.036 163.9);
+    --brand-400: oklch(0.72 0.049 163.9);
+    --brand-500: oklch(0.54 0.058 163.9);
+    --brand-600: oklch(0.382 0.061 163.9);
+    --brand-700: oklch(0.332 0.055 163.9);
+    --brand-800: oklch(0.282 0.045 163.9);
+    --brand-900: oklch(0.232 0.036 163.9);
+    --brand-950: oklch(0.182 0.027 163.9);
+
+    --background: oklch(0.985 0.004 100);
+    --foreground: oklch(0.2 0.008 100);
+    --card: oklch(0.998 0.002 100);
+    --card-foreground: oklch(0.2 0.008 100);
+    --popover: oklch(0.998 0.002 100);
+    --popover-foreground: oklch(0.2 0.008 100);
+    --primary: var(--brand-600);
+    --primary-foreground: oklch(0.985 0.004 100);
+    --secondary: oklch(0.955 0.006 100);
+    --secondary-foreground: oklch(0.2 0.008 100);
+    --muted: oklch(0.955 0.006 100);
+    --muted-foreground: oklch(0.48 0.008 100);
+    --accent: var(--brand-100);
+    --accent-foreground: var(--brand-800);
+    --destructive: oklch(0.5 0.19 27.5);
+    /* Border thường đậm hơn một nấc; ô nhập liệu đậm hơn nữa để đạt 3:1 (WCAG 1.4.11) */
+    --border: oklch(0.78 0.01 100);
+    --input: oklch(0.6 0.01 100);
+    --ring: var(--brand-500);
+    --chart-1: var(--brand-600);
+    --chart-2: var(--brand-400);
+    --chart-3: oklch(0.55 0.1 85);
+    --chart-4: oklch(0.5 0.11 250);
+    --chart-5: oklch(0.55 0.01 100);
+    --radius: 0.5rem;
+    --sidebar: oklch(0.975 0.005 100);
+    --sidebar-foreground: oklch(0.2 0.008 100);
+    --sidebar-primary: var(--brand-600);
+    --sidebar-primary-foreground: oklch(0.985 0.004 100);
+    --sidebar-accent: var(--brand-100);
+    --sidebar-accent-foreground: var(--brand-800);
+    --sidebar-border: oklch(0.78 0.01 100);
+    --sidebar-ring: var(--brand-500);
+
+    /* Màu trạng thái lịch hẹn: nền nhạt + chữ đậm, luôn kèm icon (không chỉ dựa vào màu) */
+    --status-pending: oklch(0.95 0.05 88);
+    --status-pending-foreground: oklch(0.42 0.09 70);
+    --status-confirmed: oklch(0.945 0.045 152);
+    --status-confirmed-foreground: oklch(0.38 0.09 152);
+    --status-progress: oklch(0.945 0.035 250);
+    --status-progress-foreground: oklch(0.42 0.11 255);
+    --status-done: oklch(0.93 0.008 100);
+    --status-done-foreground: oklch(0.3 0.008 100);
+    --status-cancelled: oklch(0.955 0.006 100);
+    --status-cancelled-foreground: oklch(0.45 0.008 100);
+    --status-rejected: oklch(0.95 0.035 25);
+    --status-rejected-foreground: oklch(0.45 0.15 27);
+
+    /* Mật độ "Vừa" (khu khách) */
+    --control-h: 2.5rem;
+    --row-h: 2.75rem;
+    --card-pad: 1rem;
+}
+
+.dark {
+    --background: oklch(0.16 0.008 100);
+    --foreground: oklch(0.96 0.004 100);
+    --card: oklch(0.2 0.008 100);
+    --card-foreground: oklch(0.96 0.004 100);
+    --popover: oklch(0.2 0.008 100);
+    --popover-foreground: oklch(0.96 0.004 100);
+    /* Accent đậm gần như tàng hình trên nền tối: dùng bậc 400, chữ bậc 950 */
+    --primary: var(--brand-400);
+    --primary-foreground: var(--brand-950);
+    --secondary: oklch(0.26 0.008 100);
+    --secondary-foreground: oklch(0.96 0.004 100);
+    --muted: oklch(0.26 0.008 100);
+    --muted-foreground: oklch(0.72 0.008 100);
+    --accent: oklch(0.28 0.03 164);
+    --accent-foreground: var(--brand-200);
+    --destructive: oklch(0.7 0.17 22);
+    --border: oklch(0.42 0.01 100);
+    --input: oklch(0.55 0.01 100);
+    --ring: var(--brand-400);
+    --chart-1: var(--brand-400);
+    --chart-2: var(--brand-300);
+    --chart-3: oklch(0.75 0.11 85);
+    --chart-4: oklch(0.72 0.1 250);
+    --chart-5: oklch(0.7 0.01 100);
+    --sidebar: oklch(0.18 0.008 100);
+    --sidebar-foreground: oklch(0.96 0.004 100);
+    --sidebar-primary: var(--brand-400);
+    --sidebar-primary-foreground: var(--brand-950);
+    --sidebar-accent: oklch(0.28 0.03 164);
+    --sidebar-accent-foreground: var(--brand-200);
+    --sidebar-border: oklch(0.42 0.01 100);
+    --sidebar-ring: var(--brand-400);
+
+    --status-pending: oklch(0.3 0.05 80);
+    --status-pending-foreground: oklch(0.88 0.1 88);
+    --status-confirmed: oklch(0.3 0.05 152);
+    --status-confirmed-foreground: oklch(0.88 0.1 152);
+    --status-progress: oklch(0.3 0.05 250);
+    --status-progress-foreground: oklch(0.88 0.08 250);
+    --status-done: oklch(0.3 0.008 100);
+    --status-done-foreground: oklch(0.9 0.008 100);
+    --status-cancelled: oklch(0.26 0.008 100);
+    --status-cancelled-foreground: oklch(0.74 0.008 100);
+    --status-rejected: oklch(0.3 0.06 25);
+    --status-rejected-foreground: oklch(0.88 0.08 25);
+}
+
+/* Mật độ "Gọn" (khu nhân viên/quản lý): control thấp hơn, chuyển động gần như tĩnh */
+.density-compact {
+    --control-h: 2rem;
+    --row-h: 2.25rem;
+    --card-pad: 0.75rem;
+    --default-transition-duration: 120ms;
+}
+
+@theme {
+    /* Motion "Tinh tế": 200ms, ease-out mềm. Tailwind đọc hai biến này cho mọi `transition` */
+    --default-transition-duration: 200ms;
+    --default-transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@theme inline {
+    --font-sans: var(--font-sans);
+    --font-heading: var(--font-heading);
+    --color-brand-50: var(--brand-50);
+    --color-brand-100: var(--brand-100);
+    --color-brand-200: var(--brand-200);
+    --color-brand-300: var(--brand-300);
+    --color-brand-400: var(--brand-400);
+    --color-brand-500: var(--brand-500);
+    --color-brand-600: var(--brand-600);
+    --color-brand-700: var(--brand-700);
+    --color-brand-800: var(--brand-800);
+    --color-brand-900: var(--brand-900);
+    --color-brand-950: var(--brand-950);
+    --color-status-pending: var(--status-pending);
+    --color-status-pending-foreground: var(--status-pending-foreground);
+    --color-status-confirmed: var(--status-confirmed);
+    --color-status-confirmed-foreground: var(--status-confirmed-foreground);
+    --color-status-progress: var(--status-progress);
+    --color-status-progress-foreground: var(--status-progress-foreground);
+    --color-status-done: var(--status-done);
+    --color-status-done-foreground: var(--status-done-foreground);
+    --color-status-cancelled: var(--status-cancelled);
+    --color-status-cancelled-foreground: var(--status-cancelled-foreground);
+    --color-status-rejected: var(--status-rejected);
+    --color-status-rejected-foreground: var(--status-rejected-foreground);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+  h1, h2, h3, h4 {
+    @apply font-heading font-semibold tracking-tight;
+    }
+  svg.lucide {
+    stroke-width: 1.75;
+    }
+}
+
+/* Người dùng bật "Reduce motion": gần như tắt hết chuyển động ở cả hai khu */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

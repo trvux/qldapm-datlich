@@ -18,6 +18,7 @@ Theo dõi tiến độ trên Trello: https://trello.com/b/hfSS40aF (số `#NN` t
 ```
 backend/    FastAPI + PostgreSQL (Python). Chạy: xem backend/README.md
 frontend/   Giao diện web tĩnh (Tri), chạy bằng run_frontend.py. Xem frontend/README.md
+web/        Giao diện mới thương hiệu Marque (Next.js + shadcn/ui, bun), khu khách và khu admin. Xem web/README.md
 docs/
   api/      Đặc tả API Backend - Frontend (hợp đồng giữa 2 bên) + openapi.json
   sprint2/  Tài liệu Sprint 2 (kết quả chạy thử...)
@@ -38,6 +39,8 @@ uv run uvicorn app.main:app --reload     # http://localhost:8000/docs
 ```
 
 Giao diện (cửa sổ khác): `cd frontend && python3 run_frontend.py` rồi mở http://localhost:3000. Backend cho phép CORS từ cổng 3000 theo mặc định; nếu đổi cổng (`PORT=3003`) thì thêm địa chỉ đó vào `CORS_ORIGINS` trong `backend/.env`.
+
+Giao diện mới (`web/`, cần [bun](https://bun.sh)): `cd web && bun install && bun run dev -p 3100` rồi mở http://localhost:3100. Web gọi API qua `/api` (Next chuyển tiếp sang Backend) nên chạy ở cổng nào cũng không dính CORS. Chi tiết: [`web/README.md`](web/README.md).
 
 Tài khoản demo và chi tiết: [`backend/README.md`](backend/README.md).
 
