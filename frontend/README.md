@@ -33,7 +33,7 @@ Wireframe đang lệch quy tắc nghiệp vụ: vẽ 4 "Ca" 2 giờ, trong khi q
 | Màn | Cần sửa |
 |---|---|
 | WF-03 Đặt lịch | Thay 4 nút "Ca" bằng lưới 8 ô (4 sáng, 4 chiều, tách bằng nhãn nghỉ trưa). Ô xe: dropdown "Xe của tôi" + nút "Thêm xe mới" (biển số, hãng, dòng, năm) thay vì nhập tay. |
-| WF-04 Theo dõi, đổi/hủy | Đổi "Ca 1 (08:00-10:00)" thành "08:00-09:00" ở chi tiết lịch và ở bảng lịch hẹn. |
-| WF-05 Nhân viên | Bỏ 4 ô Ca ở đầu danh sách; thay bằng bộ lọc ngày + trạng thái (BR18). Cột "Khung giờ" ghi theo 1 giờ. |
+| WF-04 Theo dõi, đổi/hủy | Đổi "Ca 1 (08:00-10:00)" thành "08:00-09:00" ở thẻ lịch và 2 dòng bảng (`13:00-15:00` thành `13:00-14:00`). Thống nhất kiểu mã lịch với WF-05. Thanh trạng thái thêm "Bị từ chối" và "Đã hủy". |
+| WF-05 Nhân viên | Bỏ 4 ô Ca ở đầu danh sách hoặc đổi thành 8 ô theo giờ (bộ lọc Ngày và Lọc đã có, giữ nguyên). Cột "Khung giờ" ghi theo 1 giờ. Nút "Từ chối" cần ô nhập lý do (BR15). Tab 2 đổi `(F01)` thành `(F02)` (BR03). Sửa chỗ số điện thoại đè lên cột Biển số. |
 | WF-07 Báo cáo | Biểu đồ "Hiệu suất theo Ca 1-4" đổi thành theo 8 khung giờ, hoặc bỏ. BR24 chỉ yêu cầu thống kê theo ngày hẹn, trạng thái, dịch vụ. |
 | Frame tổng `00_TAT_CA_7_MAN_HINH` | Cập nhật lại sau khi sửa các màn trên. |
