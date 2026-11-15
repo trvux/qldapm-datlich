@@ -55,7 +55,7 @@ function LoginForm() {
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-8">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-center lg:text-left">
         <h1 className="text-3xl">Đăng nhập</h1>
         <p className="text-muted-foreground">Dùng tài khoản của Marque để đặt lịch và theo dõi lịch hẹn.</p>
       </div>
@@ -73,9 +73,9 @@ function LoginForm() {
           {busy && <Spinner />}Đăng nhập
         </Button>
       </form>
-      <div className="flex flex-col gap-2 border-t pt-5">
+      <div className="flex flex-col gap-2 border-t pt-5 text-center lg:text-left">
         <p className="text-xs text-muted-foreground">Tài khoản demo (điền nhanh)</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
           {DEMO.map((d) => (
             <Button key={d.label} type="button" variant="outline" size="sm" onClick={() => { setEmail(d.email); setPassword(d.password) }}>
               {d.label}
@@ -101,7 +101,7 @@ export default function LoginPage() {
         <Chequy size={8} className="absolute inset-x-0 bottom-0 text-band-foreground/90" />
       </aside>
       <main className="flex flex-col px-6 py-8 sm:px-10">
-        <Link href="/" aria-label="Marque, trang chủ" className="text-primary lg:hidden"><LogoCompact className="h-10" /></Link>
+        <Link href="/" aria-label="Marque, trang chủ" className="mx-auto text-primary lg:hidden"><LogoCompact className="h-10" /></Link>
         <div className="flex flex-1 items-center justify-center py-10"><Suspense><LoginForm /></Suspense></div>
       </main>
     </div>
