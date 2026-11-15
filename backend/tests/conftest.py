@@ -81,11 +81,15 @@ def db(_database):
 
 @pytest.fixture(autouse=True)
 def _clean(_database):
-    """Mỗi test bắt đầu từ trạng thái sạch: không còn lịch hẹn, sức chứa về 3, xe thêm tay bị xóa."""
+    """Mỗi test bắt đầu từ trạng thái sạch: không còn lịch hẹn, sức chứa về 3, xe và dịch vụ thêm tay bị xóa."""
     with psycopg.connect(TEST_URL, autocommit=True) as conn:
         conn.execute("TRUNCATE appointment_status_history, appointments RESTART IDENTITY")
         conn.execute("UPDATE time_slots SET max_capacity = 3")
         conn.execute("DELETE FROM vehicles WHERE vehicle_id > 6")
+        # Dịch vụ thêm trong test (id > 8) bị xóa; 8 dịch vụ mẫu trở về trạng thái ban đầu (chỉ #8 đã ngừng).
+        # Xóa được vì lịch hẹn đã bị TRUNCATE ở trên.
+        conn.execute("DELETE FROM services WHERE service_id > 8")
+        conn.execute("UPDATE services SET is_active = (service_id <> 8)")
         conn.execute("UPDATE users SET is_active = (email <> 'locked@example.com')")
     yield
 
