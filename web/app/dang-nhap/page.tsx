@@ -95,7 +95,7 @@ export default function LoginPage() {
         <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-band/85 via-band/40 to-band/90" />
         <Link href="/" aria-label="Marque, trang chủ" className="relative"><LogoCompact className="h-12 text-band-foreground" /></Link>
         <div className="relative flex max-w-md flex-col gap-3">
-          <p className="font-heading text-3xl leading-snug font-semibold text-balance">Bảo dưỡng xe đúng giờ, đúng cách.</p>
+          <p className="font-heading text-3xl leading-snug font-semibold text-balance">Bảo dưỡng xe<br /><span className="inline-block">đúng giờ,</span> <span className="inline-block">đúng cách.</span></p>
           <p className="text-sm text-band-foreground/80">Đặt lịch, đổi lịch và theo dõi trạng thái ngay trên trang.</p>
         </div>
         <Chequy size={8} className="absolute inset-x-0 bottom-0 text-band-foreground/90" />

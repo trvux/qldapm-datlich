@@ -228,6 +228,10 @@
     }
   h1, h2, h3, h4 {
     @apply font-heading font-semibold tracking-tight;
+    text-wrap: balance;
+    }
+  p {
+    text-wrap: pretty;
     }
   svg.lucide {
     stroke-width: 1.75;

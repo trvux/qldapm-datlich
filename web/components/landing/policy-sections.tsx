@@ -14,7 +14,7 @@ export function HeroPoints() {
     ? [`${policy.openDays}, ${policy.span}`, `Đặt trước tối đa ${policy.max_advance_days} ngày`, "Giá tham khảo công khai"]
     : ["Giá tham khảo công khai"]
   return (
-    <ul className="flex flex-col gap-2.5 pt-2 text-sm text-muted-foreground">
+    <ul className="flex flex-col items-center gap-2.5 pt-2 text-sm text-muted-foreground lg:items-start">
       {points.map((p) => (
         <li key={p} className="flex items-center gap-2.5"><Check className="size-4 shrink-0 text-primary" />{p}</li>
       ))}
