@@ -138,6 +138,20 @@ class SlotOut(BaseModel):
     closed_reason: SlotClosedReason | None = None
 
 
+class PolicyOut(BaseModel):
+    """Quy định đặt lịch cho khách xem (BR07, BR10, BR11, BR19, BR22). Lấy từ cấu hình Backend."""
+    open_days: list[int] = Field(description="Thứ mở cửa theo ISO (1 = Thứ Hai ... 7 = Chủ nhật)")
+    open_time: time
+    lunch_start: time
+    lunch_end: time
+    close_time: time
+    min_lead_hours: int = Field(description="BR10: đặt trước giờ hẹn ít nhất")
+    max_advance_days: int = Field(description="BR10: không đặt quá số ngày này")
+    max_active: int = Field(description="BR11: số lịch đang hiệu lực tối đa mỗi khách")
+    change_lead_hours: int = Field(description="BR19: đổi/hủy trước giờ hẹn ít nhất")
+    max_changes: int = Field(description="BR22: số lần đổi tối đa mỗi lịch")
+
+
 class SlotCapacityUpdate(BaseModel):
     max_capacity: int = Field(ge=1, le=50)
 

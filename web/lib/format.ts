@@ -43,7 +43,7 @@ export const ALL_STATUSES = Object.keys(STATUS_LABEL) as AppointmentStatus[]
 export const SLOT_CLOSED_LABEL: Record<string, string> = {
   FULL: "Hết chỗ",
   IN_PAST: "Đã qua",
-  TOO_SOON: "Cần đặt trước ít nhất 2 giờ",
+  TOO_SOON: "Quá gần giờ hẹn",
   TOO_FAR: "Chưa mở đặt",
 }
 export const slotClosedLabel = (reason?: string | null) => (reason && SLOT_CLOSED_LABEL[reason]) || "Không nhận lịch"

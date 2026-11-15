@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import db
 from app.config import get_settings
 from app.errors import install_error_handlers
-from app.routers import appointments, auth, reports, services, slots, vehicles
+from app.routers import appointments, auth, policy, reports, services, slots, vehicles
 
 
 @asynccontextmanager
@@ -33,7 +33,7 @@ app.add_middleware(
 )
 install_error_handlers(app)
 
-for r in (auth, services, vehicles, slots, appointments, reports):
+for r in (auth, services, vehicles, slots, policy, appointments, reports):
     app.include_router(r.router)
 
 

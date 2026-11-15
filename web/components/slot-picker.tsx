@@ -7,16 +7,18 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { api, type Slot } from "@/lib/api"
 import { addDays, formatRange, formatShortDate, slotClosedLabel, todayISO } from "@/lib/format"
 import { useApi } from "@/lib/use-api"
+import { usePolicy } from "@/lib/policy"
 import { cn } from "@/lib/utils"
 
 const WEEKDAY = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
-const DAYS = 14
 
-/** Chọn ngày (dải 14 ngày, cuộn ngang trên mobile) rồi chọn khung giờ. Khung hết chỗ bị khóa. */
+/** Chọn ngày (dải số ngày đặt trước tối đa theo GET /policy, cuộn ngang trên mobile) rồi chọn khung giờ. Khung hết chỗ bị khóa. */
 export function SlotPicker({ value, onChange }: { value: number | null; onChange: (slot: Slot) => void }) {
   const from = useMemo(() => todayISO(), [])
-  const to = addDays(from, DAYS - 1)
-  const { data, error, loading } = useApi(() => api.slots(from, to), [from, to])
+  const { policy, error: policyError } = usePolicy()
+  const DAYS = policy?.max_advance_days ?? 0
+  const to = addDays(from, Math.max(DAYS - 1, 0))
+  const { data, error, loading } = useApi(() => (DAYS ? api.slots(from, to) : Promise.resolve([] as Slot[])), [from, to, DAYS])
   const [picked, setPicked] = useState<string | null>(null)
 
   const byDay = useMemo(() => {
@@ -24,13 +26,13 @@ export function SlotPicker({ value, onChange }: { value: number | null; onChange
     for (const s of data ?? []) m.set(s.slot_date, [...(m.get(s.slot_date) ?? []), s])
     return m
   }, [data])
-  const days = useMemo(() => Array.from({ length: DAYS }, (_, i) => addDays(from, i)), [from])
+  const days = useMemo(() => Array.from({ length: DAYS }, (_, i) => addDays(from, i)), [from, DAYS])
 
   // Ngày mặc định: ngày đầu tiên còn khung giờ nhận lịch, cho tới khi khách tự chọn ngày khác
   const day = picked ?? (data ? (days.find((d) => (byDay.get(d) ?? []).some((s) => s.bookable)) ?? days[0]) : null)
 
-  if (error) return <ErrorNote error={error} />
-  if (loading || !day) return <Skeleton className="h-40 w-full" />
+  if (policyError || error) return <ErrorNote error={policyError ?? error} />
+  if (!policy || loading || !day) return <Skeleton className="h-40 w-full" />
 
   const slots = (byDay.get(day) ?? []).slice().sort((a, b) => a.start_time.localeCompare(b.start_time))
   return (

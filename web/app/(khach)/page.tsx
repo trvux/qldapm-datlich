@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarCheck, Check, ListChecks, Receipt } from "lucide-react"
+import { ArrowRight, CalendarCheck, ListChecks, Receipt } from "lucide-react"
 import Link from "next/link"
 
 import { Roundel } from "@/components/brand/illustrations"
@@ -6,24 +6,11 @@ import { BrandPhoto, Chequy, Eyebrow, ShieldFrame } from "@/components/brand/mot
 import { Container } from "@/components/layout/container"
 import { Section } from "@/components/layout/section"
 import { Faq } from "@/components/landing/faq"
+import { CtaLead, HeroPoints, PolicyFacts } from "@/components/landing/policy-sections"
 import { ServicesPreview } from "@/components/landing/services-preview"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { PHOTOS } from "@/lib/photos"
-import { POLICY } from "@/lib/policy"
-
-const HERO_POINTS = [
-  `${POLICY.openDays}, 08:00 - 17:00`,
-  `Đặt trước tối đa ${POLICY.maxAdvanceDays} ngày`,
-  "Giá tham khảo công khai",
-]
-
-const FACTS = [
-  { value: "08:00 - 17:00", label: `${POLICY.openDays}, nghỉ trưa 12:00 - 13:00` },
-  { value: `${POLICY.maxAdvanceDays} ngày`, label: "Đặt trước tối đa" },
-  { value: `${POLICY.maxActive} lịch`, label: "Đang hiệu lực cùng lúc" },
-  { value: `${POLICY.changeLeadHours} giờ`, label: "Đổi hoặc hủy trước giờ hẹn" },
-]
 
 const STEPS = [
   { title: "Đặt lịch", body: "Chọn xe, dịch vụ và khung giờ còn chỗ. Lịch mới ở trạng thái Chờ xác nhận." },
@@ -62,11 +49,7 @@ export default function HomePage() {
               <Button asChild size="lg"><Link href="/dat-lich">Đặt lịch</Link></Button>
               <Button asChild size="lg" variant="outline"><Link href="/dich-vu">Xem dịch vụ</Link></Button>
             </div>
-            <ul className="flex flex-col gap-2.5 pt-2 text-sm text-muted-foreground">
-              {HERO_POINTS.map((p) => (
-                <li key={p} className="flex items-center gap-2.5"><Check className="size-4 shrink-0 text-primary" />{p}</li>
-              ))}
-            </ul>
+            <HeroPoints />
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:col-span-6 lg:max-w-none">
@@ -83,14 +66,7 @@ export default function HomePage() {
 
       {/* Quy định đặt lịch */}
       <section aria-label="Quy định đặt lịch" className="border-b bg-card">
-        <Container className="grid grid-cols-2 gap-x-6 gap-y-8 py-10 md:grid-cols-4 md:py-12">
-          {FACTS.map((f) => (
-            <div key={f.label} className="flex flex-col gap-1.5">
-              <span className="font-heading text-2xl font-semibold tabular-nums text-primary sm:text-3xl">{f.value}</span>
-              <span className="text-sm text-muted-foreground">{f.label}</span>
-            </div>
-          ))}
-        </Container>
+        <PolicyFacts />
       </section>
 
       {/* Dịch vụ */}
@@ -175,7 +151,7 @@ export default function HomePage() {
         <div className="grid items-center gap-8 md:grid-cols-12">
           <div className="flex flex-col gap-3 md:col-span-8">
             <h2 className="text-3xl sm:text-4xl">Sẵn sàng cho lần bảo dưỡng tiếp theo?</h2>
-            <p className="max-w-xl text-band-foreground/80">Chọn khung giờ còn chỗ trong {POLICY.maxAdvanceDays} ngày tới. Đặt lịch chỉ mất một phút.</p>
+            <CtaLead />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row md:col-span-4 md:justify-end">
             <Button asChild size="lg" className="bg-band-foreground text-band hover:bg-band-foreground/90"><Link href="/dat-lich">Đặt lịch</Link></Button>
