@@ -43,5 +43,6 @@ cd ../frontend && python3 run_frontend.py     # cửa sổ 2, mở http://localh
 
 ## 4. Điều kiện chưa đạt (nợ kỹ thuật)
 
-- Chưa tập dượt **cả nhóm cùng lúc** (cần 3 người). Phần tập kỹ thuật trên máy do Huỳnh Bảo Huy chạy ngày 15/11/2026.
-- Bộ slide (Việc #44) và bộ đóng gói (Việc #48) là đầu vào của buổi tập dượt chính thức; xem trạng thái ở Trello.
+- Phần tập kỹ thuật trên máy do Huỳnh Bảo Huy chạy ngày 15/11/2026 (có ảnh `evidence/UI01` đến `UI11`).
+- Buổi tập dượt cả nhóm (Huy, Tri, Quang) đã diễn ra tại lớp, theo xác nhận của Huỳnh Bảo Huy. Chưa có ảnh hay biên bản riêng cho buổi này.
+- Bộ slide (Việc #44) đang được Huy làm lại; bộ đóng gói (Việc #48) xem trạng thái ở Trello.
