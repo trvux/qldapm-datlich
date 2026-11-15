@@ -1,5 +1,6 @@
 import { Container } from "@/components/layout/container"
 import { Eyebrow } from "@/components/brand/motifs"
+import { protect } from "@/lib/text"
 import { cn } from "@/lib/utils"
 
 /**
@@ -28,8 +29,8 @@ export function Section({
           <div className={cn("mb-10 flex flex-col gap-5 md:mb-14", align === "center" ? "items-center text-center" : "md:flex-row md:items-end md:justify-between")}>
             <div className={cn("flex max-w-2xl flex-col gap-3", align === "center" && "items-center")}>
               {eyebrow && <Eyebrow className={cn(brand && "text-band-foreground", align === "center" && "justify-center")}>{eyebrow}</Eyebrow>}
-              {title && <h2 className="text-3xl sm:text-4xl">{title}</h2>}
-              {description && <p className={cn("text-base sm:text-lg", brand ? "text-band-foreground/80" : "text-muted-foreground")}>{description}</p>}
+              {title && <h2 className="text-3xl sm:text-4xl">{protect(title)}</h2>}
+              {description && <p className={cn("text-base sm:text-lg", brand ? "text-band-foreground/80" : "text-muted-foreground")}>{protect(description)}</p>}
             </div>
             {actions && <div className={cn("flex shrink-0 flex-col gap-2 sm:flex-row [&>*]:w-full sm:[&>*]:w-auto", align === "center" && "justify-center")}>{actions}</div>}
           </div>

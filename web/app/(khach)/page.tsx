@@ -11,6 +11,7 @@ import { ServicesPreview } from "@/components/landing/services-preview"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { PHOTOS } from "@/lib/photos"
+import { protect } from "@/lib/text"
 
 const STEPS = [
   { title: "Đặt lịch", body: "Chọn xe, dịch vụ và khung giờ còn chỗ. Lịch mới ở trạng thái Chờ xác nhận." },
@@ -39,9 +40,9 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative border-b">
         <Container className="grid items-center gap-12 py-12 md:py-16 lg:grid-cols-12 lg:gap-10 lg:py-24">
-          <div className="flex flex-col items-start gap-6 lg:col-span-6">
+          <div className="flex flex-col items-center gap-6 text-center lg:col-span-6 lg:items-start lg:text-left">
             <Eyebrow>Bảo dưỡng và sửa chữa ô tô</Eyebrow>
-            <h1 className="text-4xl leading-[1.08] text-balance sm:text-5xl xl:text-6xl">Bảo dưỡng xe đúng giờ, đúng cách.</h1>
+            <h1 className="text-4xl leading-[1.08] text-balance sm:text-5xl">Bảo dưỡng xe<br /><span className="inline-block">đúng giờ,</span> <span className="inline-block">đúng cách.</span></h1>
             <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
               Chọn dịch vụ, chọn khung giờ và giữ chỗ trực tuyến. Trung tâm xác nhận, Quý&nbsp;khách theo dõi từng bước.
             </p>
@@ -145,7 +146,7 @@ export default function HomePage() {
       <Section tone="brand" className="py-14 md:py-20">
         <div className="flex flex-col items-center gap-6 text-center">
           <div className="flex flex-col items-center gap-3">
-            <h2 className="text-3xl sm:text-4xl">Sẵn sàng cho lần bảo dưỡng tiếp theo?</h2>
+            <h2 className="text-3xl sm:text-4xl">{protect("Sẵn sàng cho lần bảo dưỡng tiếp theo?")}</h2>
             <CtaLead />
           </div>
           <Button asChild size="lg" className="bg-band-foreground text-band hover:bg-band-foreground/90"><Link href="/dat-lich">Đặt lịch</Link></Button>

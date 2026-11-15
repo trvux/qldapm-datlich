@@ -1,4 +1,5 @@
 import { Eyebrow, StripeRule } from "@/components/brand/motifs"
+import { protect } from "@/lib/text"
 import { cn } from "@/lib/utils"
 
 /**
@@ -19,8 +20,8 @@ export function PageHeader({
       <div className={cn("flex flex-col gap-4", center ? "items-center gap-5 text-center" : "sm:flex-row sm:items-end sm:justify-between sm:gap-6")}>
         <div className={cn("flex min-w-0 max-w-2xl flex-col gap-2", center && "items-center")}>
           {eyebrow && <Eyebrow className={center ? "justify-center" : undefined}>{eyebrow}</Eyebrow>}
-          <h1 className={size === "lg" ? "text-3xl sm:text-4xl" : "text-2xl"}>{title}</h1>
-          {description && <p className="text-muted-foreground">{description}</p>}
+          <h1 className={size === "lg" ? "text-3xl sm:text-4xl" : "text-2xl"}>{protect(title)}</h1>
+          {description && <p className="text-muted-foreground">{protect(description)}</p>}
         </div>
         {actions && <div className={cn("flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center [&>*]:w-full sm:[&>*]:w-auto", center && "justify-center")}>{actions}</div>}
       </div>
