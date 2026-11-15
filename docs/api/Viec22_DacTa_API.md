@@ -98,7 +98,7 @@ Response `200`:
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
   "token_type": "bearer",
   "expires_in": 3600,
-  "user": { "user_id": 4, "full_name": "Pham Minh Khach", "email": "khach1@example.com", "role": "CUSTOMER" }
+  "user": { "user_id": 4, "full_name": "Phạm Minh Khách", "email": "khach1@example.com", "role": "CUSTOMER" }
 }
 ```
 
@@ -124,8 +124,8 @@ Quản lý thêm `?include_inactive=true` để thấy cả dịch vụ đã ng�
 [
   {
     "service_id": 1,
-    "name": "Bao duong dinh ky 10.000 km",
-    "description": "Thay dau dong co, loc dau, kiem tra tong quat 30 hang muc",
+    "name": "Bảo dưỡng định kỳ 10.000 km",
+    "description": "Thay dầu động cơ, lọc dầu, kiểm tra tổng quát 30 hạng mục",
     "duration_minutes": 60,
     "reference_price": 850000,
     "is_active": true
@@ -210,9 +210,9 @@ Response `201` kèm header `Location: /appointments/{id}`:
   "note": "Xe kêu lạ ở bánh trước",
   "reject_reason": null,
   "change_count": 0,
-  "customer": { "user_id": 4, "full_name": "Pham Minh Khach" },
+  "customer": { "user_id": 4, "full_name": "Phạm Minh Khách" },
   "vehicle": { "vehicle_id": 1, "license_plate": "51F-678.90", "brand": "Honda", "model": "CR-V", "year": 2022 },
-  "service": { "service_id": 1, "name": "Bao duong dinh ky 10.000 km", "duration_minutes": 60, "reference_price": 850000 },
+  "service": { "service_id": 1, "name": "Bảo dưỡng định kỳ 10.000 km", "duration_minutes": 60, "reference_price": 850000 },
   "slot": { "slot_id": 25, "slot_date": "2026-11-13", "start_time": "08:00:00", "end_time": "09:00:00" },
   "handled_by": null,
   "created_at": "2026-11-10T13:23:31.965792+07:00",
@@ -308,7 +308,7 @@ Chỉ `MANAGER` (BR24). `from` mặc định ngày 1 của tháng này, `to` m�
   "from": "2026-11-01", "to": "2026-11-30", "total": 3,
   "by_date":    [ { "date": "2026-11-16", "count": 2 } ],
   "by_status":  [ { "status": "PENDING", "count": 1 }, "... đủ 6 trạng thái, kể cả 0" ],
-  "by_service": [ { "service_id": 1, "name": "Bao duong dinh ky 10.000 km", "count": 2 } ]
+  "by_service": [ { "service_id": 1, "name": "Bảo dưỡng định kỳ 10.000 km", "count": 2 } ]
 }
 ```
 

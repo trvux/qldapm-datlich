@@ -17,7 +17,7 @@ export function UserMenu({ area }: { area: "khach" | "admin" }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="max-w-44 gap-2 px-2.5" aria-label={`Tài khoản ${user.full_name}`}>
+        <Button variant="ghost" className="max-w-56 gap-2 px-2.5" aria-label={`Tài khoản ${user.full_name}`}>
           <UserRound className="size-4 shrink-0" />
           <span className="hidden truncate sm:inline">{user.full_name}</span>
         </Button>
