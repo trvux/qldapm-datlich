@@ -42,6 +42,7 @@ export default function AdminHome() {
       />
       <ErrorNote error={todayList.error ?? pending.error} who="staff" />
 
+      <p className="-mb-3 text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Hôm nay theo trạng thái</p>
       <section aria-label="Lịch hẹn hôm nay theo trạng thái" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {KPIS.map(({ status, icon: Icon }) => (
           <div key={status} className="flex flex-col gap-2 rounded-lg border bg-card p-(--card-pad)">
@@ -79,7 +80,7 @@ export default function AdminHome() {
 
         <section aria-labelledby="queue-title" className="flex flex-col gap-3 lg:col-span-5">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 id="queue-title" className="text-lg">Chờ xác nhận</h2>
+            <h2 id="queue-title" className="text-lg">Chờ xác nhận (mọi ngày)</h2>
             <span className="text-sm text-muted-foreground tabular-nums">{pending.loading ? "" : `${queue.length} lịch`}</span>
           </div>
           {pending.loading ? (

@@ -1,6 +1,6 @@
 import { StatusBadge } from "@/components/status-badge"
 import type { Appointment, AppointmentStatus } from "@/lib/api"
-import { STATUS_LABEL, formatDate, formatDateTime, formatRange, formatVND } from "@/lib/format"
+import { STATUS_LABEL, formatDate, formatRange, formatVND } from "@/lib/format"
 
 function Field({ k, children }: { k: string; children: React.ReactNode }) {
   return (
@@ -34,20 +34,41 @@ export function AppointmentInfo({ a }: { a: Appointment }) {
   )
 }
 
-/** Lịch sử trạng thái, mới nhất ở trên. */
+/** Ngày và giờ tách riêng cho cột ngày của sổ theo dõi. */
+function splitDateTime(iso: string) {
+  const d = new Date(iso)
+  return {
+    date: `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`,
+    year: d.getFullYear(),
+    time: d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+  }
+}
+
+/** Lịch sử trạng thái như trang sổ theo dõi của hãng xe: lề đôi bên trái, dòng kẻ ngang, cột ngày serif; mới nhất ở trên. */
 export function AppointmentHistory({ a }: { a: Appointment }) {
+  const rows = a.history.slice().reverse()
   return (
     <section aria-labelledby={`hist-${a.appointment_id}`} className="flex flex-col gap-3">
-      <h3 id={`hist-${a.appointment_id}`} className="text-base">Lịch sử trạng thái</h3>
-      <ol className="flex flex-col gap-4 border-l pl-4">
-        {a.history.slice().reverse().map((h, i) => (
-          <li key={i} className="relative flex flex-col gap-0.5">
-            <span aria-hidden className="absolute top-1.5 -left-[21px] size-2.5 rounded-full border-2 border-background bg-primary" />
-            <span className="text-sm font-medium">{STATUS_LABEL[h.new_status as AppointmentStatus]}</span>
-            <span className="text-xs text-muted-foreground tabular-nums">{formatDateTime(h.changed_at)}</span>
-            {h.note && <span className="text-sm text-muted-foreground">{h.note}</span>}
-          </li>
-        ))}
+      <div className="flex flex-col gap-1">
+        <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Sổ theo dõi</p>
+        <h3 id={`hist-${a.appointment_id}`} className="text-base">Lịch sử trạng thái</h3>
+      </div>
+      <ol className="flex flex-col border-y border-l-[5px] border-double border-primary/50 pl-3">
+        {rows.map((h, i) => {
+          const t = splitDateTime(h.changed_at)
+          return (
+            <li key={i} className="grid grid-cols-[3.75rem_1fr] gap-3 border-b border-dashed py-2.5 last:border-b-0">
+              <div className="flex flex-col leading-tight tabular-nums">
+                <span className={`font-heading text-base font-semibold ${i === 0 ? "text-primary" : ""}`}>{t.date}</span>
+                <span className="text-[11px] text-muted-foreground">{t.time}</span>
+              </div>
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className={`text-sm ${i === 0 ? "font-semibold" : "font-medium"}`}>{STATUS_LABEL[h.new_status as AppointmentStatus]}</span>
+                {h.note && <span className="text-sm text-muted-foreground">{h.note}</span>}
+              </div>
+            </li>
+          )
+        })}
       </ol>
     </section>
   )

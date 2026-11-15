@@ -44,10 +44,12 @@ function Row({ k, v }: { k: string; v: string | null }) {
 
 function BookingForm() {
   const router = useRouter()
-  const preset = useSearchParams().get("service")
+  const params = useSearchParams()
+  const preset = params.get("service")
+  const presetVehicle = params.get("vehicle")
   const vehicles = useApi(() => api.vehicles(), [])
   const services = useApi(() => api.services(), [])
-  const [vehicleId, setVehicleId] = useState("")
+  const [vehicleId, setVehicleId] = useState(presetVehicle ?? "")
   const [serviceId, setServiceId] = useState(preset ?? "")
   const [slot, setSlot] = useState<Slot | null>(null)
   const [note, setNote] = useState("")

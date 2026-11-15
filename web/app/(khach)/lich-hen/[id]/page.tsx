@@ -6,7 +6,8 @@ import { useParams } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { AppointmentHistory, AppointmentInfo } from "@/components/appointment-detail"
+import { AppointmentHistory } from "@/components/appointment-detail"
+import { AppointmentTicket } from "@/components/appointment-ticket"
 import { AppPage } from "@/components/layout/app-page"
 import { PageHeader } from "@/components/layout/page-header"
 import { ErrorNote } from "@/components/error-note"
@@ -104,16 +105,16 @@ function Detail() {
       <ErrorNote error={error} />
       {loading ? <Skeleton className="h-72 w-full" /> : data && (
         <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
-          <div className="flex flex-col gap-6 rounded-lg border bg-card p-6 lg:col-span-7">
-            <AppointmentInfo a={data} />
+          <div className="flex flex-col gap-4 lg:col-span-8">
+            <AppointmentTicket a={data} />
             {canChange && (
-              <div className="flex flex-wrap gap-2 border-t pt-5">
+              <div className="flex flex-wrap gap-2">
                 <Reschedule a={data} onDone={reload} />
                 <Cancel a={data} onDone={reload} />
               </div>
             )}
           </div>
-          <div className="rounded-lg border bg-card p-6 lg:col-span-5"><AppointmentHistory a={data} /></div>
+          <div className="rounded-lg border bg-card p-6 lg:col-span-4"><AppointmentHistory a={data} /></div>
         </div>
       )}
     </AppPage>
