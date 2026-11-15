@@ -41,7 +41,7 @@ export function PolicyFacts() {
     <Container className="grid grid-cols-2 gap-x-6 gap-y-8 py-10 md:grid-cols-4 md:py-12">
       {facts.map((f) => (
         <div key={f.label} className="flex flex-col gap-1.5">
-          <span className="font-heading text-2xl font-semibold tabular-nums text-primary sm:text-3xl">{f.value}</span>
+          <span className="font-heading text-2xl font-semibold text-primary sm:text-3xl">{f.value}</span>
           <span className="text-sm text-muted-foreground">{f.label}</span>
         </div>
       ))}

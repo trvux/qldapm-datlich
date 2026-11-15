@@ -13,7 +13,7 @@ function Barcode({ seed }: { seed: number }) {
   )
 }
 
-const EYEBROW = "text-[11px] tracking-[0.14em] text-muted-foreground uppercase"
+const EYEBROW = "text-[11px] font-semibold tracking-[0.06em] text-muted-foreground uppercase"
 
 function Field({ k, children }: { k: string; children: React.ReactNode }) {
   return (
@@ -32,7 +32,7 @@ export function AppointmentTicket({ a }: { a: Appointment }) {
   const no = String(a.appointment_id).padStart(4, "0")
   const model = [a.vehicle.brand, a.vehicle.model].filter(Boolean).join(" ")
   return (
-    <article aria-label={`Phiếu lịch hẹn số ${no}`} className="relative overflow-hidden rounded-lg border bg-card">
+    <article aria-label={`Phiếu lịch hẹn số ${no}`} className="relative overflow-hidden rounded-lg bg-card shadow-[inset_0_0_0_1px_var(--border)]">
       <Chequy size={5} rows={1} className="text-primary" />
       <span aria-hidden className="punch-edge punch-edge-l" />
       <span aria-hidden className="punch-edge punch-edge-r" />
@@ -41,19 +41,19 @@ export function AppointmentTicket({ a }: { a: Appointment }) {
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
               <p className={EYEBROW}>Phiếu lịch hẹn</p>
-              <p className="font-heading text-4xl leading-none font-semibold text-primary tabular-nums">{no}</p>
+              <p className="font-heading text-4xl leading-none font-semibold text-primary">{no}</p>
             </div>
             <StatusStamp status={a.status} />
           </div>
 
           <div className="flex flex-col gap-1 border-y border-dashed py-4">
-            <p className="font-heading text-2xl font-semibold tabular-nums">{formatDate(a.slot.slot_date)}</p>
-            <p className="text-lg text-muted-foreground tabular-nums">{formatRange(a.slot.start_time, a.slot.end_time)}</p>
+            <p className="font-heading text-2xl font-semibold">{formatDate(a.slot.slot_date)}</p>
+            <p className="text-lg text-muted-foreground">{formatRange(a.slot.start_time, a.slot.end_time)}</p>
           </div>
 
           <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
             <Field k="Dịch vụ">{a.service.name}</Field>
-            <Field k="Giá tham khảo"><span className="font-heading text-base font-semibold text-primary tabular-nums">{formatVND(a.service.reference_price)}</span></Field>
+            <Field k="Giá tham khảo"><span className="font-heading text-base font-semibold text-primary">{formatVND(a.service.reference_price)}</span></Field>
             <Field k="Xe">
               <span className="flex flex-wrap items-center gap-2"><PlateBadge className="text-sm">{a.vehicle.license_plate}</PlateBadge>{model}</span>
             </Field>
@@ -70,14 +70,14 @@ export function AppointmentTicket({ a }: { a: Appointment }) {
           <span aria-hidden className="absolute -top-2 right-0 size-4 translate-x-1/2 rounded-full border bg-background md:top-auto md:right-auto md:bottom-0 md:left-0 md:translate-y-1/2 md:-translate-x-1/2" />
           <div className="flex flex-col gap-3 text-primary">
             <p className={EYEBROW}>Cuống phiếu</p>
-            <p className="font-heading text-2xl font-semibold tabular-nums">{no}</p>
+            <p className="font-heading text-2xl font-semibold">{no}</p>
             <StripeRule />
           </div>
           <div className="flex flex-col gap-3">
             <Barcode seed={a.appointment_id} />
             <div className="flex flex-col gap-1 text-xs text-muted-foreground">
             <p>Giữ phiếu này khi đưa xe đến Trung tâm.</p>
-            <p className="tabular-nums">Lập lúc {formatDateTime(a.created_at)}</p>
+            <p className="">Lập lúc {formatDateTime(a.created_at)}</p>
             </div>
           </div>
         </div>

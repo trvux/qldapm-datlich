@@ -25,7 +25,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
   return (
     <section className="flex flex-col gap-4" aria-labelledby={`step-${n}`}>
       <h2 id={`step-${n}`} className="flex items-center gap-3 text-xl">
-        <span className="inline-flex size-7 items-center justify-center rounded-sm bg-primary font-sans text-sm font-semibold text-primary-foreground tabular-nums">{n}</span>
+        <span className="inline-flex size-7 items-center justify-center rounded-sm bg-primary font-sans text-sm font-semibold text-primary-foreground">{n}</span>
         {title}
       </h2>
       {children}
@@ -37,7 +37,7 @@ function Row({ k, v }: { k: string; v: string | null }) {
   return (
     <div className="flex justify-between gap-4">
       <dt className="text-muted-foreground">{k}</dt>
-      <dd className={v ? "text-right font-medium tabular-nums" : "text-right text-muted-foreground"}>{v ?? "Chưa chọn"}</dd>
+      <dd className={v ? "text-right font-medium" : "text-right text-muted-foreground"}>{v ?? "Chưa chọn"}</dd>
     </div>
   )
 }
@@ -112,7 +112,7 @@ function BookingForm() {
                     <RadioGroupItem id={`svc-${s.service_id}`} value={String(s.service_id)} className="mt-0.5" />
                     <span className="flex flex-1 flex-col gap-0.5">
                       <span className="font-medium">{s.name}</span>
-                      <span className="text-xs text-muted-foreground tabular-nums">{s.duration_minutes} phút · {formatVND(s.reference_price)}</span>
+                      <span className="text-xs text-muted-foreground">{s.duration_minutes} phút · {formatVND(s.reference_price)}</span>
                     </span>
                   </Label>
                 ))}
@@ -147,7 +147,7 @@ function BookingForm() {
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-1">
           <div className="min-w-0 flex-1 text-sm">
             <p className="truncate font-medium">{service?.name ?? "Chưa chọn dịch vụ"}</p>
-            <p className="truncate text-xs text-muted-foreground tabular-nums">{slot ? `${formatDate(slot.slot_date)} · ${formatRange(slot.start_time, slot.end_time)}` : "Chưa chọn thời gian"}</p>
+            <p className="truncate text-xs text-muted-foreground">{slot ? `${formatDate(slot.slot_date)} · ${formatRange(slot.start_time, slot.end_time)}` : "Chưa chọn thời gian"}</p>
           </div>
           <div className="w-32 shrink-0">{submitButton}</div>
         </div>

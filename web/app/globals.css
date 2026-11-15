@@ -250,13 +250,13 @@
   pointer-events: none;
 }
 
-/* Lỗ khoan hai mép phiếu lịch hẹn: nửa vòng tròn đều nhau, màu nền trang, viền theo --border */
+/* Lỗ khoan hai mép phiếu lịch hẹn: nửa vòng tròn đều nhau tô màu nền trang kèm cung viền; viền thẻ là bóng inset nên bị lỗ che đi, cung viền của lỗ nối liền vào viền thẻ (viền uốn quanh lỗ) */
 .punch-edge {
   position: absolute;
   top: 16px;
   bottom: 8px;
   width: 10px;
-  background-image: radial-gradient(circle at var(--cx) 50%, var(--background) 0 5px, color-mix(in oklch, var(--foreground) 35%, transparent) 5px 6px, transparent 6px);
+  background-image: radial-gradient(circle at var(--cx) 50%, var(--background) 0 5px, var(--border) 5px 6px, transparent 6px);
   background-size: 100% 20px;
   background-repeat: repeat-y;
   pointer-events: none;
@@ -297,17 +297,20 @@
 .car-drive { animation: car-drive-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .car-wheel { transform-box: fill-box; transform-origin: center; animation: wheel-spin 2.2s linear infinite; }
 @keyframes wind-gust {
-  0% { stroke-dashoffset: 1; opacity: 0; transform: translateX(0); }
-  6% { opacity: 0.8; }
-  36% { stroke-dashoffset: 0; }
-  62% { stroke-dashoffset: -1; opacity: 0.8; transform: translateX(-46px); }
-  70% { opacity: 0; }
-  100% { stroke-dashoffset: -1; opacity: 0; transform: translateX(-46px); }
+  0% { transform: translateX(0) scaleX(0); opacity: 0; }
+  22% { transform: translateX(-4px) scaleX(1); opacity: 1; }
+  62% { transform: translateX(-34px) scaleX(1.1); opacity: 0.7; }
+  100% { transform: translateX(-70px) scaleX(0.25); opacity: 0; }
 }
-/* Gió: nét vẽ lướt từ phải sang trái (đường dài 1 đơn vị pathLength, nét 1 và khoảng trống 1): đầu nét kéo dài ra trước, rồi đuôi bị xóa theo;
-   mỗi đoạn ease-in-out nên chạy nhanh rồi chậm dần, chỉ hoạt động khoảng 70% chu kỳ ngắn nên thỉnh thoảng mới có */
-.car-wind { opacity: 0; stroke-dasharray: 1 1; animation: wind-gust var(--wd, 4s) ease-in-out infinite; animation-delay: var(--wl, 0s); }
+/* Gió: vệt khí mọc ra từ đuôi xe (gốc bên phải, sát xe), dài dần, trượt về sau và thu nhỏ mờ dần; mỗi đoạn ease-out để nhanh rồi chậm */
+.car-wind { opacity: 0; transform-box: fill-box; transform-origin: right center; animation: wind-gust var(--wd, 3.4s) ease-out infinite; animation-delay: var(--wl, 0s); }
 .car-road { animation: road-run var(--t, 200ms) linear infinite; }
+
+/* Lưới thẻ căn giữa: hàng cuối thiếu thẻ thì dồn vào giữa thay vì sát trái (1 cột mobile, 2 cột từ sm, 3 cột từ lg, khoảng cách 1rem) */
+.cards-center { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+.cards-center > * { width: 100%; }
+@media (min-width: 640px) { .cards-center > * { width: calc((100% - 1rem) / 2); } }
+@media (min-width: 1024px) { .cards-center > * { width: calc((100% - 2rem) / 3); } }
 
 /* Người dùng bật "Reduce motion": gần như tắt hết chuyển động ở cả hai khu */
 @media (prefers-reduced-motion: reduce) {

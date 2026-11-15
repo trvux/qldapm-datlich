@@ -24,7 +24,7 @@ function Capacity({ booked, max }: { booked: number; max: number }) {
           ))}
         </span>
       ) : (
-        <span aria-hidden className="tabular-nums">Đã đặt {booked}/{max}</span>
+        <span aria-hidden className="">Đã đặt {booked}/{max}</span>
       )}
     </span>
   )
@@ -74,7 +74,7 @@ export function SlotPicker({ value, onChange }: { value: number | null; onChange
               )}
             >
               <span className="text-xs">{WEEKDAY[dt.getDay()]}</span>
-              <span className="font-medium tabular-nums">{formatShortDate(d)}</span>
+              <span className="font-medium">{formatShortDate(d)}</span>
             </button>
           )
         })}
@@ -94,7 +94,7 @@ export function SlotPicker({ value, onChange }: { value: number | null; onChange
                 disabled={!s.bookable}
                 onClick={() => onChange(s)}
                 className={cn(
-                  "flex min-h-(--control-h) flex-col items-center justify-center rounded-md border px-2 py-1 text-sm tabular-nums transition-colors disabled:cursor-not-allowed disabled:opacity-45",
+                  "flex min-h-(--control-h) flex-col items-center justify-center rounded-md border px-2 py-1 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-45",
                   selected ? "border-primary bg-accent text-accent-foreground" : "hover:bg-muted"
                 )}
               >

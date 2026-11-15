@@ -42,12 +42,12 @@ export default function AdminHome() {
       />
       <ErrorNote error={todayList.error ?? pending.error} who="staff" />
 
-      <p className="-mb-3 text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Hôm nay theo trạng thái</p>
+      <p className="-mb-3 text-[11px] font-semibold tracking-[0.06em] text-muted-foreground uppercase">Hôm nay theo trạng thái</p>
       <section aria-label="Lịch hẹn hôm nay theo trạng thái" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {KPIS.map(({ status, icon: Icon }) => (
           <div key={status} className="flex flex-col gap-2 rounded-lg border bg-card p-(--card-pad)">
             <p className="flex items-center gap-2 text-sm text-muted-foreground"><Icon className="size-4" />{STATUS_LABEL[status]}</p>
-            {todayList.loading ? <Skeleton className="h-9 w-12" /> : <p className="font-heading text-3xl font-semibold tabular-nums">{count(status)}</p>}
+            {todayList.loading ? <Skeleton className="h-9 w-12" /> : <p className="font-heading text-3xl font-semibold">{count(status)}</p>}
           </div>
         ))}
       </section>
@@ -56,7 +56,7 @@ export default function AdminHome() {
         <section aria-labelledby="today-title" className="flex flex-col gap-3 lg:col-span-7">
           <div className="flex items-baseline justify-between gap-3">
             <h2 id="today-title" className="text-lg">Lịch hôm nay</h2>
-            <span className="text-sm text-muted-foreground tabular-nums">{todayList.loading ? "" : `${byTime.length} lịch`}</span>
+            <span className="text-sm text-muted-foreground">{todayList.loading ? "" : `${byTime.length} lịch`}</span>
           </div>
           {todayList.loading ? (
             <div className="flex flex-col gap-2">{Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-14" />)}</div>
@@ -66,10 +66,10 @@ export default function AdminHome() {
             <ul className="divide-y rounded-lg border bg-card">
               {byTime.map((a) => (
                 <li key={a.appointment_id} className="flex items-center gap-4 px-(--card-pad) py-2.5">
-                  <span className="w-12 shrink-0 font-heading font-semibold tabular-nums">{formatTime(a.slot.start_time)}</span>
+                  <span className="w-12 shrink-0 font-heading font-semibold">{formatTime(a.slot.start_time)}</span>
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-sm font-medium">{a.service.name}</span>
-                    <span className="truncate text-xs text-muted-foreground">{a.customer.full_name} · <span className="tabular-nums">{a.vehicle.license_plate}</span></span>
+                    <span className="truncate text-xs text-muted-foreground">{a.customer.full_name} · <span className="">{a.vehicle.license_plate}</span></span>
                   </div>
                   <StatusBadge status={a.status} />
                 </li>
@@ -81,7 +81,7 @@ export default function AdminHome() {
         <section aria-labelledby="queue-title" className="flex flex-col gap-3 lg:col-span-5">
           <div className="flex items-baseline justify-between gap-3">
             <h2 id="queue-title" className="text-lg">Chờ xác nhận (mọi ngày)</h2>
-            <span className="text-sm text-muted-foreground tabular-nums">{pending.loading ? "" : `${queue.length} lịch`}</span>
+            <span className="text-sm text-muted-foreground">{pending.loading ? "" : `${queue.length} lịch`}</span>
           </div>
           {pending.loading ? (
             <div className="flex flex-col gap-2">{Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-24" />)}</div>
@@ -92,9 +92,9 @@ export default function AdminHome() {
               {queue.map((a) => (
                 <li key={a.appointment_id} className="flex flex-col gap-3 rounded-lg border bg-card p-(--card-pad)">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium tabular-nums">#{a.appointment_id} · {a.service.name}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</span>
-                    <span className="text-xs text-muted-foreground">{a.customer.full_name} · <span className="tabular-nums">{a.vehicle.license_plate}</span></span>
+                    <span className="text-sm font-medium">#{a.appointment_id} · {a.service.name}</span>
+                    <span className="text-xs text-muted-foreground">{formatDate(a.slot.slot_date)} · {formatRange(a.slot.start_time, a.slot.end_time)}</span>
+                    <span className="text-xs text-muted-foreground">{a.customer.full_name} · <span className="">{a.vehicle.license_plate}</span></span>
                   </div>
                   <AppointmentActions a={a} onDone={reloadAll} />
                 </li>

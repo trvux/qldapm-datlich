@@ -16,15 +16,15 @@ export function AppointmentInfo({ a }: { a: Appointment }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="text-xl tabular-nums">Lịch hẹn #{a.appointment_id}</h2>
+        <h2 className="text-xl">Lịch hẹn #{a.appointment_id}</h2>
         <StatusBadge status={a.status} />
       </div>
       <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
         <Field k="Dịch vụ">{a.service.name}</Field>
-        <Field k="Giá tham khảo"><span className="tabular-nums">{formatVND(a.service.reference_price)}</span></Field>
-        <Field k="Ngày"><span className="tabular-nums">{formatDate(a.slot.slot_date)}</span></Field>
-        <Field k="Giờ"><span className="tabular-nums">{formatRange(a.slot.start_time, a.slot.end_time)}</span></Field>
-        <Field k="Xe"><span className="tabular-nums">{a.vehicle.license_plate}</span> · {[a.vehicle.brand, a.vehicle.model].filter(Boolean).join(" ")}</Field>
+        <Field k="Giá tham khảo"><span className="">{formatVND(a.service.reference_price)}</span></Field>
+        <Field k="Ngày"><span className="">{formatDate(a.slot.slot_date)}</span></Field>
+        <Field k="Giờ"><span className="">{formatRange(a.slot.start_time, a.slot.end_time)}</span></Field>
+        <Field k="Xe"><span className="">{a.vehicle.license_plate}</span> · {[a.vehicle.brand, a.vehicle.model].filter(Boolean).join(" ")}</Field>
         <Field k="Khách hàng">{a.customer.full_name}</Field>
         {a.note && <div className="sm:col-span-2"><Field k="Ghi chú">{a.note}</Field></div>}
         {a.reject_reason && <div className="sm:col-span-2"><Field k="Lý do từ chối"><span className="text-destructive">{a.reject_reason}</span></Field></div>}
@@ -50,7 +50,7 @@ export function AppointmentHistory({ a }: { a: Appointment }) {
   return (
     <section aria-labelledby={`hist-${a.appointment_id}`} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
-        <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Sổ theo dõi</p>
+        <p className="text-[11px] font-semibold tracking-[0.06em] text-muted-foreground uppercase">Sổ theo dõi</p>
         <h3 id={`hist-${a.appointment_id}`} className="text-base">Lịch sử trạng thái</h3>
       </div>
       <ol className="flex flex-col border-y border-l-[5px] border-double border-primary/50 pl-3">
@@ -58,7 +58,7 @@ export function AppointmentHistory({ a }: { a: Appointment }) {
           const t = splitDateTime(h.changed_at)
           return (
             <li key={i} className="grid grid-cols-[3.75rem_1fr] gap-3 border-b border-dashed py-2.5 last:border-b-0">
-              <div className="flex flex-col leading-tight tabular-nums">
+              <div className="flex flex-col leading-tight">
                 <span className={`font-heading text-base font-semibold ${i === 0 ? "text-primary" : ""}`}>{t.date}</span>
                 <span className="text-[11px] text-muted-foreground">{t.time}</span>
               </div>

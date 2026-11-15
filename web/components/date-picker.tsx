@@ -45,7 +45,7 @@ export function DatePicker({
         <Button
           type="button"
           variant="outline"
-          className={cn("justify-start font-normal tabular-nums", !value && "text-muted-foreground", className)}
+          className={cn("justify-start font-normal", !value && "text-muted-foreground", className)}
           {...props}
         >
           <CalendarIcon aria-hidden data-icon="inline-start" />

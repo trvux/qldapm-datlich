@@ -36,7 +36,7 @@ function Report() {
       {loading || !data ? <div className="grid gap-3 lg:grid-cols-3"><Skeleton className="h-64 lg:col-span-2" /><Skeleton className="h-64" /></div> : (
         <div className="grid gap-3 lg:grid-cols-3">
           <Card className="lg:col-span-2">
-            <CardHeader><CardTitle className="text-base">Lịch hẹn theo ngày</CardTitle><CardDescription className="tabular-nums">Tổng {data.total} lịch</CardDescription></CardHeader>
+            <CardHeader><CardTitle className="text-base">Lịch hẹn theo ngày</CardTitle><CardDescription className="">Tổng {data.total} lịch</CardDescription></CardHeader>
             <CardContent>
               {data.by_date.length === 0 ? <p className="text-sm text-muted-foreground">Không có dữ liệu trong khoảng này.</p> : (
                 <ChartContainer config={chartConfig} className="h-56 w-full">
@@ -54,7 +54,7 @@ function Report() {
           <div className="flex flex-col gap-3">
             <Card size="sm">
               <CardHeader><CardTitle className="text-base">Theo trạng thái</CardTitle></CardHeader>
-              <CardContent><ul className="flex flex-col gap-2">{data.by_status.map((s) => <li key={s.status} className="flex items-center justify-between"><StatusBadge status={s.status} /><span className="font-medium tabular-nums">{s.count}</span></li>)}</ul></CardContent>
+              <CardContent><ul className="flex flex-col gap-2">{data.by_status.map((s) => <li key={s.status} className="flex items-center justify-between"><StatusBadge status={s.status} /><span className="font-medium">{s.count}</span></li>)}</ul></CardContent>
             </Card>
             <Card size="sm">
               <CardHeader><CardTitle className="text-base">Theo dịch vụ</CardTitle></CardHeader>
@@ -62,7 +62,7 @@ function Report() {
                 <ul className="flex flex-col gap-3">
                   {data.by_service.map((s) => (
                     <li key={s.service_id} className="flex flex-col gap-1">
-                      <div className="flex items-baseline justify-between gap-2 text-sm"><span className="truncate">{s.name}</span><span className="font-medium tabular-nums">{s.count}</span></div>
+                      <div className="flex items-baseline justify-between gap-2 text-sm"><span className="truncate">{s.name}</span><span className="font-medium">{s.count}</span></div>
                       <div className="h-1.5 rounded-sm bg-secondary"><div className="h-full rounded-sm bg-primary" style={{ width: `${(s.count / maxService) * 100}%` }} /></div>
                     </li>
                   ))}

@@ -7,7 +7,7 @@ import type { Vehicle } from "@/lib/api"
 import { formatDate } from "@/lib/format"
 import { bodyOf } from "@/lib/vehicle-body"
 
-const EYEBROW = "text-[11px] tracking-[0.14em] text-muted-foreground uppercase"
+const EYEBROW = "text-[11px] font-semibold tracking-[0.06em] text-muted-foreground uppercase"
 
 export type VehicleStats = { visits: number; last?: string; next?: string }
 
@@ -20,7 +20,7 @@ function Row({ k, children }: { k: string; children: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-dashed py-2 last:border-b-0">
       <dt className={EYEBROW}>{k}</dt>
-      <dd className="font-heading text-base font-semibold tabular-nums">{children}</dd>
+      <dd className="font-heading text-base font-semibold">{children}</dd>
     </div>
   )
 }
@@ -60,8 +60,8 @@ export function VehicleCard({ vehicle: v, index, stats }: { vehicle: Vehicle; in
       </div>
 
       <div className="flex items-center justify-between gap-3 border-t bg-muted/40 px-6 py-3 text-xs text-muted-foreground">
-        <span className="tabular-nums">{stats.visits > 0 ? `Đã bảo dưỡng ${stats.visits} lần` : "Chưa bảo dưỡng tại Trung tâm"}</span>
-        <span className="text-right tabular-nums">
+        <span className="">{stats.visits > 0 ? `Đã bảo dưỡng ${stats.visits} lần` : "Chưa bảo dưỡng tại Trung tâm"}</span>
+        <span className="text-right">
           {stats.next ? `Lịch tới: ${formatDate(stats.next)}` : stats.last ? `Gần nhất: ${formatDate(stats.last)}` : ""}
         </span>
       </div>

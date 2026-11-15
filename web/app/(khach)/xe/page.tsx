@@ -40,7 +40,7 @@ function Vehicles() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="cards-center">
           {data!.map((v, i) => <VehicleCard key={v.vehicle_id} vehicle={v} index={i} stats={stats(v.vehicle_id)} />)}
         </ul>
       )}
