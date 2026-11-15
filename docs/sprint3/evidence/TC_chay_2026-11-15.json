@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-15",
+  "base": "http://localhost:8000",
+  "results": [
+    {
+      "tc": "TC01",
+      "title": "Đặt lịch hợp lệ",
+      "status": "PASS",
+      "actual": "HTTP 201, status=PENDING, chỗ trống 3 -> 2"
+    },
+    {
+      "tc": "TC02",
+      "title": "Thiếu dịch vụ bắt buộc",
+      "status": "PASS",
+      "actual": "HTTP 422 VALIDATION_ERROR"
+    },
+    {
+      "tc": "TC03",
+      "title": "Khung giờ đã qua",
+      "status": "SKIP",
+      "actual": "CSDL chỉ có khung giờ từ ngày nạp dữ liệu trở đi nên không thử được qua API. Đã có test tự động: tests/test_booking.py::test_cannot_book_a_slot_in_the_past (SLOT_IN_PAST), và BOOKING_TOO_SOON ở cùng tệp"
+    },
+    {
+      "tc": "TC04",
+      "title": "Khung giờ đủ 3/3 xe",
+      "status": "PASS",
+      "actual": "HTTP 409 SLOT_FULL, còn 0 chỗ"
+    },
+    {
+      "tc": "TC05",
+      "title": "Trùng xe cùng khung giờ",
+      "status": "PASS",
+      "actual": "HTTP 409 VEHICLE_ALREADY_BOOKED"
+    },
+    {
+      "tc": "TC06",
+      "title": "Hai khách tranh chỗ cuối",
+      "status": "PASS",
+      "actual": "HTTP [201, 409], chỗ trống còn 0"
+    },
+    {
+      "tc": "TC07",
+      "title": "Nhân viên xem và lọc danh sách",
+      "status": "PASS",
+      "actual": "tất cả=8, PENDING=8, theo ngày 2026-11-17=8"
+    },
+    {
+      "tc": "TC08",
+      "title": "Nhân viên xác nhận lịch",
+      "status": "PASS",
+      "actual": "HTTP 200, status=CONFIRMED, handled_by=2"
+    },
+    {
+      "tc": "TC09",
+      "title": "Từ chối kèm lý do, trả chỗ",
+      "status": "PASS",
+      "actual": "thiếu lý do: HTTP 422; có lý do: HTTP 200, status=REJECTED, chỗ 0 -> 1"
+    },
+    {
+      "tc": "TC10",
+      "title": "Chặn thao tác sai trạng thái",
+      "status": "PASS",
+      "actual": "confirm lần 2: HTTP 409 INVALID_STATUS_TRANSITION; complete khi chưa bắt đầu: HTTP 409 INVALID_STATUS_TRANSITION"
+    },
+    {
+      "tc": "TC11",
+      "title": "Đổi ngày nạp lại 8 khung giờ",
+      "status": "PASS",
+      "actual": "số khung giờ của ['2026-11-17', '2026-11-18'] = [8, 8]"
+    },
+    {
+      "tc": "TC12",
+      "title": "Khách và nhân viên cùng thấy lịch vừa tạo",
+      "status": "PASS",
+      "actual": "#1 có ở khách=True, nhân viên=True"
+    }
+  ]
+}

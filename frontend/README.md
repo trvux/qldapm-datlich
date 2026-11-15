@@ -1,39 +1,33 @@
-# Frontend
+# Frontend - Hệ thống Quản lý Đặt lịch Bảo dưỡng và Sửa chữa Ô tô Trực tuyến XYZ
 
-Người phụ trách: Trần Ngọc Tôn Tri. Thư mục này **chưa có code**; dựng giao diện ở Việc #24 (khung giao diện + trang đăng nhập).
+Thư mục `frontend/` chứa toàn bộ mã nguồn giao diện người dùng (Single-Page Web Application) do thành viên **Trần Ngọc Tôn Tri** xây dựng và hoàn thiện qua **Sprint 2 (Việc #24, #26, #31)** và **Sprint 3 (Việc #38, #43, #48)**.
 
-Công nghệ đề bài không ràng buộc phần giao diện. Gợi ý Next.js (chưa chốt, Tri quyết định và ghi lại ở đây):
+## 1. Các màn hình chức năng đã hoàn thiện (Bao phủ 100% F01 – F09)
+
+1. **Màn hình Đăng nhập & Phân quyền (`#view-login` — F09, Việc #24):**
+   - Đăng nhập bằng `email` + `password` (`POST /auth/login`), lưu JWT token và khôi phục phiên qua `GET /auth/me`.
+   - Hiển thị đúng thanh điều hướng theo 4 chế độ (`GUEST`, `CUSTOMER`, `STAFF`, `MANAGER`).
+   - Xử lý tài khoản bị khóa (`403 ACCOUNT_DISABLED` — BR02) và hỗ trợ 6 nút điền nhanh tài khoản mẫu kiểm thử.
+2. **Màn hình Tra cứu Dịch vụ Công khai & Quản trị Dịch vụ (`#view-services` — F01, F02, Việc #26):**
+   - Khách vãng lai và Khách hàng tra cứu 7 dịch vụ đang hoạt động (`GET /services`), lọc theo thời lượng, xem hộp thoại chi tiết (`GET /services/{id}`) và chuyển thẳng sang đặt lịch.
+   - Quản lý (`MANAGER`) thêm dịch vụ mới (`POST /services`), sửa thông tin và chuyển trạng thái **Ngừng hoạt động / Kích hoạt lại** (`PATCH /services/{id}` — tuân thủ BR05 không xóa cứng dịch vụ).
+3. **Màn hình Đặt lịch Trực tuyến & Lưới 8 Khung giờ (`#view-booking` — F03, F07, Việc #31):**
+   - Quản lý danh sách **Xe của tôi** (`GET /vehicles`, `POST /vehicles` — chặn trùng biển số `409 LICENSE_PLATE_EXISTS`).
+   - Hiển thị lưới **8 khung giờ 60 phút** (4 ca sáng `08:00–12:00`, dải **Nghỉ trưa cố định `12:00–13:00`**, 4 ca chiều `13:00–17:00` — BR07) kèm số lượng xe đã đặt `booked/max_capacity` (tối đa 3 xe/ca — BR08).
+   - Tự động khóa các ô `bookable = false` kèm nhãn lý do (`FULL`, `IN_PAST`, `TOO_SOON`, `TOO_FAR`) và tự động tải lại lưới khung giờ khi gặp `409 SLOT_FULL` (BR13).
+4. **Màn hình Theo dõi Trạng thái, Đổi & Hủy Lịch hẹn (`#view-tracking` — F05, F06, Việc #38 & #43):**
+   - Dải thẻ KPI đếm theo 6 trạng thái, bộ lọc theo trạng thái/khoảng ngày, thanh tiến trình 4 bước (Visual Stepper) và Nhật ký chuyển trạng thái (`history` — BR25).
+   - Tích hợp hộp thoại **Đổi lịch hẹn nguyên tử** (`POST /appointments/{id}/reschedule` — kiểm soát tối đa 2 lần đổi `change_count <= 2` theo BR22) và nút **Hủy lịch hẹn** (`POST /appointments/{id}/cancel` — BR19, BR20).
+5. **Màn hình Nhân viên Tiếp nhận & Xử lý Lịch hẹn (`#view-lookup` — F04, Việc #27, #32 & #43):**
+   - Xem và lọc toàn bộ lịch hẹn toàn hệ thống, tra cứu theo mã lịch, thực hiện **Xác nhận (`confirm`)**, **Từ chối kèm lý do bắt buộc (`reject` — hoàn trả chỗ trống)**, **Bắt đầu thực hiện (`start`)** và **Hoàn thành (`complete`)** theo đúng State Machine BR15–BR17.
+6. **Màn hình Báo cáo Thống kê 3 Bảng cho Quản lý (`#view-reports` — F08, Việc #39 & #43):**
+   - Truy vấn `GET /reports/appointments?from=&to=`, hiển thị tổng số lịch hẹn (`total`) và 3 bảng thống kê (`by_date`, `by_status` đủ 6 trạng thái, `by_service`) kèm kiểm chứng tự động `sum(by_date) == sum(by_status) == sum(by_service) == total` (BR24).
+
+## 2. Cách khởi chạy Frontend ở cổng `3000`
 
 ```bash
 cd frontend
-npx create-next-app@latest .
+python run_frontend.py
 ```
 
-## Nối với Backend
-
-- Backend chạy ở `http://localhost:8000` (xem `backend/README.md`). Đặt vào biến môi trường, đừng gõ cứng:
-  `NEXT_PUBLIC_API_URL=http://localhost:8000` (file `.env.local`, không đưa lên Git).
-- Backend đã cho phép CORS từ `http://localhost:3000`.
-- **Hợp đồng API:** [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) (mục 2 danh sách endpoint, mục 5 luồng gọi màn hình đặt lịch). Bản máy đọc được: [`docs/api/openapi.json`](../docs/api/openapi.json), import được vào Postman.
-- Tài khoản demo để đăng nhập thử: `backend/README.md`.
-- Frontend chỉ cần xử lý theo `error.code` trong response lỗi, không cần tự kiểm tra giờ làm việc hay giới hạn lịch; Backend đã kiểm tra.
-
-## Việc cần làm trước khi code Việc #31 (màn hình đặt lịch)
-
-Wireframe đang lệch quy tắc nghiệp vụ: vẽ 4 "Ca" 2 giờ, trong khi quy tắc và CSDL là **8 khung 1 giờ**. Cần sửa wireframe trước, xem `docs/api/Viec22_DacTa_API.md` mục 8 và mục "Sửa wireframe" bên dưới.
-
-### Dữ liệu đúng để vẽ
-
-- 8 khung mỗi ngày: 08:00-09:00, 09:00-10:00, 10:00-11:00, 11:00-12:00, 13:00-14:00, 14:00-15:00, 15:00-16:00, 16:00-17:00. Nghỉ trưa 12:00-13:00 không có ô. Không có Chủ nhật.
-- Mỗi khung tối đa 3 xe. Mỗi ô hiển thị "Đã đặt x/3". Ô đủ 3 xe là "HẾT CHỖ".
-- Ô không đặt được (đã qua, còn dưới 2 giờ, xa hơn 14 ngày) cần tô mờ. API trả sẵn `bookable` và `closed_reason`.
-
-### Sửa wireframe
-
-| Màn | Cần sửa |
-|---|---|
-| WF-03 Đặt lịch | Thay 4 nút "Ca" bằng lưới 8 ô (4 sáng, 4 chiều, tách bằng nhãn nghỉ trưa). Ô xe: dropdown "Xe của tôi" + nút "Thêm xe mới" (biển số, hãng, dòng, năm) thay vì nhập tay. |
-| WF-04 Theo dõi, đổi/hủy | Đổi "Ca 1 (08:00-10:00)" thành "08:00-09:00" ở thẻ lịch và 2 dòng bảng (`13:00-15:00` thành `13:00-14:00`). Thống nhất kiểu mã lịch với WF-05. Thanh trạng thái thêm "Bị từ chối" và "Đã hủy". |
-| WF-05 Nhân viên | Bỏ 4 ô Ca ở đầu danh sách hoặc đổi thành 8 ô theo giờ (bộ lọc Ngày và Lọc đã có, giữ nguyên). Cột "Khung giờ" ghi theo 1 giờ. Nút "Từ chối" cần ô nhập lý do (BR15). Tab 2 đổi `(F01)` thành `(F02)` (BR03). Sửa chỗ số điện thoại đè lên cột Biển số. |
-| WF-07 Báo cáo | Biểu đồ "Hiệu suất theo Ca 1-4" đổi thành theo 8 khung giờ, hoặc bỏ. BR24 chỉ yêu cầu thống kê theo ngày hẹn, trạng thái, dịch vụ. |
-| Frame tổng `00_TAT_CA_7_MAN_HINH` | Cập nhật lại sau khi sửa các màn trên. |
+Hoặc nhấp đúp tệp `Chay_Frontend_Port3000.bat` trên Windows. Mở trình duyệt tại: **`http://localhost:3000`**.

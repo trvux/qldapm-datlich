@@ -17,10 +17,12 @@ Theo dõi tiến độ trên Trello: https://trello.com/b/hfSS40aF (số `#NN` t
 
 ```
 backend/    FastAPI + PostgreSQL (Python). Chạy: xem backend/README.md
-frontend/   Giao diện (Tri). Xem frontend/README.md
+frontend/   Giao diện web tĩnh (Tri), chạy bằng run_frontend.py. Xem frontend/README.md
 docs/
   api/      Đặc tả API Backend - Frontend (hợp đồng giữa 2 bên) + openapi.json
-  sprint2/  Tài liệu theo Sprint (kết quả chạy thử...)
+  sprint2/  Tài liệu Sprint 2 (kết quả chạy thử...)
+  sprint3/  Tài liệu Sprint 3 (kết quả Backend, chạy Test Case, kịch bản demo) + evidence/ (ảnh và kết quả chạy)
+  testing/  Báo cáo sửa lỗi Frontend (Việc #43)
 ```
 
 Tài liệu quản lý dự án (Charter, WBS, EVM, Risk Register...) hiện để trên Google Drive của nhóm.
@@ -34,6 +36,8 @@ docker compose up -d     # PostgreSQL + dữ liệu mẫu
 uv sync
 uv run uvicorn app.main:app --reload     # http://localhost:8000/docs
 ```
+
+Giao diện (cửa sổ khác): `cd frontend && python3 run_frontend.py` rồi mở http://localhost:3000. Backend cho phép CORS từ cổng 3000 theo mặc định; nếu đổi cổng (`PORT=3003`) thì thêm địa chỉ đó vào `CORS_ORIGINS` trong `backend/.env`.
 
 Tài khoản demo và chi tiết: [`backend/README.md`](backend/README.md).
 
@@ -50,10 +54,12 @@ Tài khoản demo và chi tiết: [`backend/README.md`](backend/README.md).
 
 | Sprint | Trạng thái | Tag | Ghi chú |
 |---|---|---|---|
-| 1 (Tuần 1) | Tài liệu và thiết kế, chưa có code | - | Schema chốt ở Việc #10, nằm trong `backend/db/schema.sql` |
-| 2 (Tuần 2) | Đang làm | chưa gắn | Backend của Huy xong (#22, #23, #25, #29, #32 phần Backend). Chờ Frontend (#24, #26, #31) và F04 (#27) |
-| 3 (Tuần 3) | Chưa bắt đầu | - | Đổi/hủy (#37), báo cáo (#39), theo dõi trạng thái (#38), sửa lỗi |
+| 1 (Tuần 1) | Xong (tài liệu và thiết kế) | chưa gắn | Schema chốt ở Việc #10, nằm trong `backend/db/schema.sql` |
+| 2 (Tuần 2) | Xong | chưa gắn | Backend (#22, #23, #25, #29), Frontend (#24, #26, #31), F04 (#27); chạy thử luồng đầu cuối ở Việc #32 |
+| 3 (Tuần 3) | Chức năng và kiểm thử xong; đang hoàn thiện hồ sơ bàn giao | chưa gắn | Đổi/hủy (#37), theo dõi trạng thái (#38), báo cáo (#39), chạy Test Case (#40), sửa lỗi (#42, #43) |
 
 ## Vấn đề đang mở
 
-Wireframe Figma vẽ 4 "Ca" 2 giờ, nhưng quy tắc nghiệp vụ (BR07) và CSDL dùng 8 khung 1 giờ. Tri sửa wireframe theo 8 khung 1 giờ; chi tiết ở `docs/api/Viec22_DacTa_API.md` mục 8.
+Đã giải quyết: wireframe vẽ 4 "Ca" 2 giờ trong khi BR07 và CSDL dùng 8 khung 1 giờ. Frontend hiện dùng đúng 8 khung 1 giờ; chi tiết ở `docs/api/Viec22_DacTa_API.md` mục 8.
+
+Chưa làm: tệp zip bàn giao (`git archive`), SMS nhắc lịch (Change Request #28, hoãn sang Release 2).

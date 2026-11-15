@@ -968,9 +968,16 @@ function handleLogout(customMsg = null) {
   state.token = null;
   state.currentUser = null;
   state.vehicles = [];
+  // Xóa dữ liệu của phiên cũ để người dùng kế tiếp không thấy lịch hẹn của người trước (Việc #43).
+  state.myAppointments = [];
+  state.selectedTrackingId = null;
+  state.currentLookupAppointment = null;
+  state.adminServices = [];
   localStorage.removeItem("xyz_access_token");
   renderHeaderAndRoleUI();
   renderBookingFormOptions();
+  renderTrackingKpis([]);
+  renderTrackingListAndDetail();
   showAlert("info", customMsg || "Bạn đã đăng xuất khỏi hệ thống.");
 }
 

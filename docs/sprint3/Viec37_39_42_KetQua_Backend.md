@@ -60,3 +60,8 @@ Phương pháp: đọc toàn bộ `backend/app/`, rồi viết test đưa dữ l
 - Chưa chạy qua giao diện: Frontend F05, F08 chưa có. Khi Tri xong, cần một lượt chạy tay (Việc #40).
 - Chưa đo hiệu năng khi nhiều người dùng. Pool kết nối tối đa 10.
 - **Việc #42 còn mở:** khi Tri đưa danh sách lỗi từ #40, cần sửa tiếp phần Backend và chạy lại bộ test này.
+
+## 7. Cập nhật 15/11/2026 (Việc #42 và #32)
+
+- **#42:** đã chạy toàn bộ luồng qua giao diện thật (đặt lịch, xác nhận, bắt đầu, hoàn tất, đổi lịch, báo cáo, quản lý dịch vụ) và 12 test case ở [`Viec40_KetQua_ChayTestCase.md`](Viec40_KetQua_ChayTestCase.md): không phát hiện thêm lỗi Backend. Danh sách lỗi từ Việc #40 của Tri không dùng được (báo cáo gốc có số liệu sai, xem Viec40), nên phần "sửa lỗi theo danh sách của Tri" được thay bằng lần chạy lại này. Lỗi duy nhất tìm thấy ở lần chạy này là lỗi Frontend FE-05 (đã sửa).
+- **#32:** luồng đặt lịch từ đầu đến cuối đã chạy lại trên giao diện thật với Backend thật ngày 15/11/2026, cùng 169 test tự động (trong đó `test_e2e_flow.py`).

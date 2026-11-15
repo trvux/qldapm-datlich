@@ -22,3 +22,10 @@
    - `FE-02`: Đồng bộ hiển thị lý do từ chối/hủy lịch giữa Backend và Frontend (Pass `TC09`).
    - `FE-03`: Khóa chặt các nút thao tác khi lịch hẹn đã ở trạng thái kết thúc `COMPLETED`, `CANCELLED`, `REJECTED` (Pass `TC10`).
    - `FE-04`: Đồng bộ bộ lọc chặn ký tự `NUL (\x00)` trả về `422 VALIDATION_ERROR` ở chế độ trải nghiệm độc lập, khớp 100% với bản vá `#42` của Backend.
+
+## 4. Bổ sung 15/11/2026: lỗi FE-05 và nợ kỹ thuật
+
+- `FE-05` (Medium): sau khi đăng xuất, màn "Lịch hẹn của tôi" vẫn hiện danh sách, bộ đếm và chi tiết phiếu của phiên trước. Phát hiện khi chạy thử giao diện thật ngày 15/11/2026.
+- Đã sửa trong `frontend/app.js`, hàm `handleLogout`: xóa `myAppointments`, `selectedTrackingId`, `currentLookupAppointment`, `adminServices` rồi vẽ lại bộ đếm và danh sách. Ảnh sau khi sửa: `docs/sprint3/evidence/UI11_DangXuat_DaSuaLoi_FE05.jpg`.
+- Người thực hiện sửa: Huỳnh Bảo Huy (nợ kỹ thuật của Việc #43). FE-05 đã đóng; chưa rà soát thêm lỗi nào khác ngoài các luồng đã chạy ở `docs/sprint3/Viec40_KetQua_ChayTestCase.md`.
+- Đường dẫn `docs/testing/Viec43_BaoCao_SuaLoi_Frontend.md` được tạo khi dời mã Frontend về `frontend/` (trước đó nằm ở `frontend/GitHub_Push_Tuan3/docs/testing/`).
