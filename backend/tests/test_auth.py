@@ -69,7 +69,7 @@ def test_me_returns_current_user(customer1):
 
 
 def test_protected_endpoint_without_token_is_401(anon):
-    r = anon.get("/slots")
+    r = anon.get("/appointments")
     assert r.status_code == 401
     assert r.json()["error"]["code"] == "UNAUTHENTICATED"
 
@@ -171,3 +171,14 @@ def test_unknown_route_uses_error_format(anon):
     r = anon.get("/khong-co-route-nay")
     assert r.status_code == 404
     assert r.json()["error"]["code"] == "NOT_FOUND"
+
+
+def test_slots_and_policy_are_public(anon):
+    assert anon.get("/slots").status_code == 200
+    r = anon.get("/policy")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["min_lead_hours"] == 2 and body["max_advance_days"] == 14
+    assert body["max_active"] == 3 and body["change_lead_hours"] == 4 and body["max_changes"] == 2
+    assert body["open_days"] == [1, 2, 3, 4, 5, 6]
+    assert (body["open_time"], body["lunch_start"], body["lunch_end"], body["close_time"]) == ("08:00:00", "12:00:00", "13:00:00", "17:00:00")

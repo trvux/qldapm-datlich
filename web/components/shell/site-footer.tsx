@@ -1,9 +1,11 @@
+"use client"
+
 import Link from "next/link"
 
 import { LogoCompact } from "@/components/brand/logo"
 import { Chequy } from "@/components/brand/motifs"
 import { Container } from "@/components/layout/container"
-import { POLICY } from "@/lib/policy"
+import { usePolicy } from "@/lib/policy"
 
 const COLS = [
   { title: "Dịch vụ", links: [{ href: "/dich-vu", label: "Tất cả dịch vụ" }, { href: "/dat-lich", label: "Đặt lịch" }, { href: "/#hoi-dap", label: "Câu hỏi thường gặp" }] },
@@ -11,6 +13,7 @@ const COLS = [
 ]
 
 export function SiteFooter() {
+  const { policy } = usePolicy()
   return (
     <footer className="mt-auto border-t">
       <Chequy size={6} rows={1} className="text-primary/70" />
@@ -29,7 +32,7 @@ export function SiteFooter() {
         ))}
         <div className="flex flex-col gap-3 md:col-span-3">
           <h2 className="font-sans text-sm font-semibold tracking-normal">Giờ làm việc</h2>
-          <p className="text-sm text-muted-foreground">{POLICY.openDays}<br />{POLICY.hours}</p>
+          <p className="text-sm text-muted-foreground">{policy ? <>{policy.openDays}<br />{policy.hours}</> : "Đang tải..."}</p>
         </div>
       </Container>
       <div className="border-t">

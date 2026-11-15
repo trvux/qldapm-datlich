@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from app import rules
 from app.config import get_settings
 from app.db import get_conn
-from app.deps import MANAGER, CurrentUser, get_current_user, require_roles
+from app.deps import MANAGER, CurrentUser, require_roles
 from app.errors import AppError
 from app.schemas import SlotCapacityUpdate, SlotOut
 
@@ -19,10 +19,9 @@ MAX_RANGE_DAYS = 31
 def list_slots(
     date_from: date | None = Query(None, alias="from", description="Mặc định: hôm nay (giờ VN)"),
     date_to: date | None = Query(None, alias="to", description="Mặc định: from + 14 ngày"),
-    _: CurrentUser = Depends(get_current_user),
     conn: psycopg.Connection = Depends(get_conn),
 ):
-    """Danh sách khung giờ kèm số chỗ còn lại để Frontend vẽ lịch (BR09)."""
+    """Danh sách khung giờ kèm số chỗ còn lại để Frontend vẽ lịch (BR09). Công khai: khách chưa đăng nhập vẫn xem được lịch trống."""
     now = rules.now_vn()
     start = date_from or now.date()
     end = date_to or start + timedelta(days=get_settings().booking_max_advance_days)

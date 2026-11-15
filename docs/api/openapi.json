@@ -351,13 +351,8 @@
           "Khung giờ & năng lực (F07)"
         ],
         "summary": "List Slots",
-        "description": "Danh sách khung giờ kèm số chỗ còn lại để Frontend vẽ lịch (BR09).",
+        "description": "Danh sách khung giờ kèm số chỗ còn lại để Frontend vẽ lịch (BR09). Công khai: khách chưa đăng nhập vẫn xem được lịch trống.",
         "operationId": "list_slots_slots_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "parameters": [
           {
             "name": "from",
@@ -477,6 +472,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/policy": {
+      "get": {
+        "tags": [
+          "Quy định đặt lịch"
+        ],
+        "summary": "Get Policy",
+        "description": "Quy định đặt lịch để Frontend hiển thị, không phải đặt cứng ở giao diện. Công khai.",
+        "operationId": "get_policy_policy_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyOut"
                 }
               }
             }
@@ -1395,6 +1412,78 @@
           "password"
         ],
         "title": "LoginRequest"
+      },
+      "PolicyOut": {
+        "properties": {
+          "open_days": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Open Days",
+            "description": "Thứ mở cửa theo ISO (1 = Thứ Hai ... 7 = Chủ nhật)"
+          },
+          "open_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Open Time"
+          },
+          "lunch_start": {
+            "type": "string",
+            "format": "time",
+            "title": "Lunch Start"
+          },
+          "lunch_end": {
+            "type": "string",
+            "format": "time",
+            "title": "Lunch End"
+          },
+          "close_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Close Time"
+          },
+          "min_lead_hours": {
+            "type": "integer",
+            "title": "Min Lead Hours",
+            "description": "BR10: đặt trước giờ hẹn ít nhất"
+          },
+          "max_advance_days": {
+            "type": "integer",
+            "title": "Max Advance Days",
+            "description": "BR10: không đặt quá số ngày này"
+          },
+          "max_active": {
+            "type": "integer",
+            "title": "Max Active",
+            "description": "BR11: số lịch đang hiệu lực tối đa mỗi khách"
+          },
+          "change_lead_hours": {
+            "type": "integer",
+            "title": "Change Lead Hours",
+            "description": "BR19: đổi/hủy trước giờ hẹn ít nhất"
+          },
+          "max_changes": {
+            "type": "integer",
+            "title": "Max Changes",
+            "description": "BR22: số lần đổi tối đa mỗi lịch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "open_days",
+          "open_time",
+          "lunch_start",
+          "lunch_end",
+          "close_time",
+          "min_lead_hours",
+          "max_advance_days",
+          "max_active",
+          "change_lead_hours",
+          "max_changes"
+        ],
+        "title": "PolicyOut",
+        "description": "Quy định đặt lịch cho khách xem (BR07, BR10, BR11, BR19, BR22). Lấy từ cấu hình Backend."
       },
       "RejectRequest": {
         "properties": {

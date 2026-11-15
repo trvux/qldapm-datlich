@@ -10,7 +10,7 @@ import { RequireManager } from "@/components/shell/admin-shell"
 import { StatusBadge } from "@/components/status-badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
-import { Input } from "@/components/ui/input"
+import { DatePicker } from "@/components/date-picker"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/lib/api"
@@ -29,8 +29,8 @@ function Report() {
     <AdminPage>
       <PageHeader size="sm" title="Báo cáo" description="Thống kê lịch hẹn theo ngày, trạng thái và dịch vụ." />
       <div className="grid grid-cols-2 gap-3 sm:flex sm:items-end">
-        <div className="flex flex-col gap-1.5"><Label htmlFor="r-from" className="text-xs text-muted-foreground">Từ ngày</Label><Input id="r-from" type="date" value={from} max={to} onChange={(e) => e.target.value && setFrom(e.target.value)} /></div>
-        <div className="flex flex-col gap-1.5"><Label htmlFor="r-to" className="text-xs text-muted-foreground">Đến ngày</Label><Input id="r-to" type="date" value={to} min={from} onChange={(e) => e.target.value && setTo(e.target.value)} /></div>
+        <div className="flex flex-col gap-1.5"><Label htmlFor="r-from" className="text-xs text-muted-foreground">Từ ngày</Label><DatePicker id="r-from" value={from} max={to} onChange={setFrom} /></div>
+        <div className="flex flex-col gap-1.5"><Label htmlFor="r-to" className="text-xs text-muted-foreground">Đến ngày</Label><DatePicker id="r-to" value={to} min={from} onChange={setTo} /></div>
       </div>
       <ErrorNote error={error} who="staff" />
       {loading || !data ? <div className="grid gap-3 lg:grid-cols-3"><Skeleton className="h-64 lg:col-span-2" /><Skeleton className="h-64" /></div> : (

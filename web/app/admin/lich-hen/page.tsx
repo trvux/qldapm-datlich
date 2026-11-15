@@ -10,6 +10,7 @@ import { AdminPage } from "@/components/layout/admin-page"
 import { PageHeader } from "@/components/layout/page-header"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -54,7 +55,7 @@ export default function AdminAppointmentsPage() {
           <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo mã, khách, biển số, dịch vụ" aria-label="Tìm lịch hẹn" className="pl-8" />
         </div>
-        <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Lọc theo ngày" className="sm:w-44" />
+        <DatePicker value={date} onChange={setDate} placeholder="Lọc theo ngày" aria-label="Lọc theo ngày" className="sm:w-52" />
         {(date || q) && <Button variant="ghost" onClick={() => { setDate(""); setQ("") }}>Xóa lọc</Button>}
       </div>
 

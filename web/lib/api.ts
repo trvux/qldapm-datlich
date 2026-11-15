@@ -47,6 +47,20 @@ export type Slot = {
   closed_reason?: string | null
 }
 
+/** Quy định đặt lịch từ GET /policy (công khai). Giờ dạng "HH:MM:SS". */
+export type Policy = {
+  open_days: number[]
+  open_time: string
+  lunch_start: string
+  lunch_end: string
+  close_time: string
+  min_lead_hours: number
+  max_advance_days: number
+  max_active: number
+  change_lead_hours: number
+  max_changes: number
+}
+
 export type HistoryEntry = {
   old_status: string | null
   new_status: AppointmentStatus
@@ -146,6 +160,8 @@ export const api = {
   vehicles: () => get<Vehicle[]>("/vehicles"),
   addVehicle: (b: VehicleInput) => post<Vehicle>("/vehicles", b),
 
+  policy: () => get<Policy>("/policy"),
+
   slots: (from?: string, to?: string) => get<Slot[]>("/slots", { from, to }),
   updateSlotCapacity: (id: number, max_capacity: number) => patch<Slot>(`/slots/${id}`, { max_capacity }),
 
@@ -180,7 +196,7 @@ const CUSTOMER_TEXT: Record<string, string> = {
   SLOT_IN_PAST: "Khung giờ này đã qua. Quý khách vui lòng chọn khung giờ khác.",
   SLOT_NOT_WORKING_HOUR: "Khung giờ này nằm ngoài giờ làm việc của Trung tâm.",
   SLOT_NOT_FOUND: "Không tìm thấy khung giờ. Quý khách vui lòng chọn lại.",
-  BOOKING_TOO_SOON: "Khung giờ này quá gần. Quý khách vui lòng đặt trước giờ hẹn ít nhất 2 giờ.",
+  BOOKING_TOO_SOON: "Khung giờ này quá gần. Quý khách vui lòng chọn khung giờ xa hơn, theo quy định đặt trước của Trung tâm.",
   BOOKING_TOO_FAR: "Khung giờ này còn quá xa. Quý khách vui lòng chọn ngày gần hơn.",
   BOOKING_LIMIT_REACHED: "Quý khách đã đạt số lịch hẹn hiệu lực tối đa. Vui lòng hoàn thành hoặc hủy một lịch trước khi đặt thêm.",
   VEHICLE_ALREADY_BOOKED: "Xe này đã có lịch hẹn trong khung giờ đó. Quý khách vui lòng chọn khung giờ khác.",

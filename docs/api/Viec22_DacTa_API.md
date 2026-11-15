@@ -63,7 +63,8 @@ Cột **Trạng thái**: ✓ đã chạy và có test (Sprint 2, 3) · ◌ đề
 | GET | `/services/{id}` | Công khai | Chi tiết dịch vụ (F02) | #26 | ✓ |
 | GET | `/vehicles` | Khách | Xe của tôi | #29 | ✓ |
 | POST | `/vehicles` | Khách | Thêm xe | #29 | ✓ |
-| GET | `/slots` | Đã đăng nhập | Khung giờ kèm số chỗ còn lại (F07) | #29 | ✓ |
+| GET | `/slots` | Công khai | Khung giờ kèm số chỗ còn lại (F07) | #29 | ✓ |
+| GET | `/policy` | Công khai | Quy định đặt lịch (giờ mở cửa, 2 giờ, 14 ngày, 3 lịch, 4 giờ, 2 lần đổi) để giao diện hiển thị | - | ✓ |
 | PATCH | `/slots/{id}` | Quản lý | Đổi số xe tối đa của khung giờ (F07) | #29 | ✓ |
 | POST | `/appointments` | Khách | **Đặt lịch** (F03) | #29 | ✓ |
 | GET | `/appointments/{id}` | Khách (của mình), Nhân viên, Quản lý | Chi tiết lịch kèm lịch sử trạng thái | #29 | ✓ |
@@ -147,6 +148,8 @@ Trả `201` kèm xe vừa tạo. Lỗi: `409 LICENSE_PLATE_EXISTS` (BR12: biển
 
 ### 3.5. `GET /slots` - Khung giờ và số chỗ còn lại (F07)
 
+Công khai (không cần token) để khách chưa đăng nhập xem được lịch trống. Quy định đặt lịch lấy ở `GET /policy`; Frontend không đặt cứng các con số này.
+
 Query: `from` và `to` (`YYYY-MM-DD`, đều không bắt buộc). Mặc định `from` = hôm nay (giờ VN), `to` = `from` + 14 ngày. Tối đa 31 ngày mỗi lần gọi.
 
 ```
@@ -181,6 +184,20 @@ GET /slots?from=2026-11-13&to=2026-11-13
 
 - Mỗi ngày có đúng 8 khung (08-12 và 13-17), không có Chủ nhật, không có khung nghỉ trưa (BR07). Frontend không cần tự xử lý các quy tắc này.
 - Lỗi: `422 INVALID_DATE_RANGE`, `422 DATE_RANGE_TOO_LARGE`.
+
+### 3.5b. `GET /policy` - Quy định đặt lịch để hiển thị
+
+Công khai, không có tham số. Các con số lấy từ cấu hình Backend (`backend/app/config.py`, `rules.py`), nên Backend đổi thì giao diện đổi theo; Frontend không đặt cứng.
+
+```json
+{
+  "open_days": [1, 2, 3, 4, 5, 6],
+  "open_time": "08:00:00", "lunch_start": "12:00:00", "lunch_end": "13:00:00", "close_time": "17:00:00",
+  "min_lead_hours": 2, "max_advance_days": 14, "max_active": 3, "change_lead_hours": 4, "max_changes": 2
+}
+```
+
+`open_days` theo ISO (1 = Thứ Hai ... 7 = Chủ nhật). Các trường còn lại tương ứng BR07 (giờ mở cửa), BR10 (`min_lead_hours`, `max_advance_days`), BR11 (`max_active`), BR19 (`change_lead_hours`), BR22 (`max_changes`).
 
 ### 3.6. `PATCH /slots/{id}` - Quản lý chỉnh sức chứa (F07)
 
@@ -320,7 +337,7 @@ Chỉ `MANAGER` (BR24). `from` mặc định ngày 1 của tháng này, `to` m�
 |---|:-:|:-:|:-:|:-:|
 | `GET /services`, `/services/{id}` | ✓ | ✓ | ✓ | ✓ |
 | `POST /services`, `PATCH /services/{id}` | | | | ✓ |
-| `GET /slots` | | ✓ | ✓ | ✓ |
+| `GET /slots`, `GET /policy` | ✓ | ✓ | ✓ | ✓ |
 | `PATCH /slots/{id}` | | | | ✓ |
 | `GET`, `POST /vehicles` | | ✓ | | |
 | `POST /appointments` | | ✓ | | |

@@ -1,16 +1,21 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { POLICY } from "@/lib/policy"
+"use client"
 
-const ITEMS = [
-  { q: "Đặt lịch trước bao lâu?", a: `Quý khách đặt trước giờ hẹn ít nhất ${POLICY.minLeadHours} giờ và không quá ${POLICY.maxAdvanceDays} ngày. Khung giờ đã qua, đã đầy hoặc quá gần sẽ bị làm mờ, kèm lý do.` },
-  { q: "Tôi có thể có bao nhiêu lịch cùng lúc?", a: `Tối đa ${POLICY.maxActive} lịch đang hiệu lực. Hoàn thành hoặc hủy một lịch để đặt thêm.` },
-  { q: "Đổi hoặc hủy lịch thế nào?", a: `Vào Lịch hẹn, chọn lịch rồi chọn Đổi lịch hoặc Hủy lịch. Chỉ thực hiện được trước giờ hẹn ít nhất ${POLICY.changeLeadHours} giờ, và mỗi lịch đổi tối đa ${POLICY.maxChanges} lần.` },
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { type PolicyView, usePolicy } from "@/lib/policy"
+
+const items = (POLICY: PolicyView) => [
+  { q: "Đặt lịch trước bao lâu?", a: `Quý khách đặt trước giờ hẹn ít nhất ${POLICY.min_lead_hours} giờ và không quá ${POLICY.max_advance_days} ngày. Khung giờ đã qua, đã đầy hoặc quá gần sẽ bị làm mờ, kèm lý do.` },
+  { q: "Tôi có thể có bao nhiêu lịch cùng lúc?", a: `Tối đa ${POLICY.max_active} lịch đang hiệu lực. Hoàn thành hoặc hủy một lịch để đặt thêm.` },
+  { q: "Đổi hoặc hủy lịch thế nào?", a: `Vào Lịch hẹn, chọn lịch rồi chọn Đổi lịch hoặc Hủy lịch. Chỉ thực hiện được trước giờ hẹn ít nhất ${POLICY.change_lead_hours} giờ, và mỗi lịch đổi tối đa ${POLICY.max_changes} lần.` },
   { q: "Giá hiển thị có phải giá cuối cùng không?", a: "Giá chỉ để tham khảo, chưa gồm phụ tùng phát sinh. Hệ thống không thanh toán trực tuyến; Quý khách thanh toán tại Trung tâm." },
-  { q: "Trung tâm làm việc khi nào?", a: `${POLICY.openDays}, ${POLICY.hours}. Nghỉ trưa 12:00 - 13:00 và nghỉ Chủ nhật.` },
+  { q: "Trung tâm làm việc khi nào?", a: `${POLICY.openDays}, ${POLICY.hours}. Nghỉ trưa ${POLICY.lunch}.` },
   { q: "Vì sao lịch của tôi bị từ chối?", a: "Nhân viên luôn ghi lý do khi từ chối. Quý khách xem lý do trong chi tiết lịch hẹn và có thể đặt lại khung giờ khác." },
 ]
 
 export function Faq() {
+  const { policy } = usePolicy()
+  if (!policy) return null
+  const ITEMS = items(policy)
   return (
     <Accordion type="single" collapsible className="w-full">
       {ITEMS.map((it, i) => (
