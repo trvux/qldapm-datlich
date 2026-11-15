@@ -59,8 +59,8 @@ Cột **Trạng thái**: ✓ đã chạy và có test (Sprint 2, 3) · ◌ đề
 |---|---|---|---|---|---|
 | POST | `/auth/login` | Công khai | Đăng nhập, nhận token | #25 | ✓ |
 | GET | `/auth/me` | Đã đăng nhập | Thông tin người đang đăng nhập | #25 | ✓ |
-| GET | `/services` | Công khai | Danh sách dịch vụ đang hoạt động (F02) | #26 | ✓ (chỉ đọc) |
-| GET | `/services/{id}` | Công khai | Chi tiết dịch vụ (F02) | #26 | ✓ (chỉ đọc) |
+| GET | `/services` | Công khai | Danh sách dịch vụ đang hoạt động (F02); Quản lý thêm `?include_inactive=true` | #26 | ✓ |
+| GET | `/services/{id}` | Công khai | Chi tiết dịch vụ (F02) | #26 | ✓ |
 | GET | `/vehicles` | Khách | Xe của tôi | #29 | ✓ |
 | POST | `/vehicles` | Khách | Thêm xe | #29 | ✓ |
 | GET | `/slots` | Đã đăng nhập | Khung giờ kèm số chỗ còn lại (F07) | #29 | ✓ |
@@ -69,9 +69,9 @@ Cột **Trạng thái**: ✓ đã chạy và có test (Sprint 2, 3) · ◌ đề
 | GET | `/appointments/{id}` | Khách (của mình), Nhân viên, Quản lý | Chi tiết lịch kèm lịch sử trạng thái | #29 | ✓ |
 | POST | `/appointments/{id}/confirm` | Nhân viên, Quản lý | Xác nhận lịch (F04) | #27 | ✓ (bản tối thiểu) |
 | POST | `/appointments/{id}/reject` | Nhân viên, Quản lý | Từ chối lịch, bắt buộc có lý do (F04) | #27 | ✓ (bản tối thiểu) |
-| POST/PATCH | `/services`, `/services/{id}` | Quản lý | Thêm, sửa, ngừng dịch vụ (F01) | #26 | ◌ |
-| GET | `/appointments` | Khách (của mình), Nhân viên, Quản lý | Danh sách, lọc theo ngày và trạng thái (F04, F06) | #27, #38 | ◌ |
-| POST | `/appointments/{id}/start`, `/complete` | Nhân viên | Xe đến, hoàn thành (F04) | #27 | ◌ |
+| POST/PATCH | `/services`, `/services/{id}` | Quản lý | Thêm, sửa, ngừng dịch vụ (F01) | #26 | ✓ |
+| GET | `/appointments` | Khách (của mình), Nhân viên, Quản lý | Danh sách, lọc theo ngày và trạng thái (F04, F06) | #27, #38 | ✓ |
+| POST | `/appointments/{id}/start`, `/complete` | Nhân viên, Quản lý | Xe đến, hoàn thành (F04) | #27 | ✓ |
 | POST | `/appointments/{id}/reschedule`, `/cancel` | Khách | Đổi, hủy lịch (F05) | #37 | ✓ |
 | GET | `/reports/appointments` | Quản lý | Thống kê (F08) | #39 | ✓ |
 | GET | `/health` | Công khai | Kiểm tra server và DB còn sống | - | ✓ |
@@ -118,6 +118,7 @@ Lỗi: `401 UNAUTHENTICATED` (thiếu token), `401 TOKEN_INVALID` (token sai ho�
 ### 3.3. `GET /services` và `GET /services/{id}` - Tra cứu dịch vụ (F02)
 
 Không cần đăng nhập (BR03). Chỉ trả dịch vụ đang hoạt động (BR05); dịch vụ đã ngừng trả `404 SERVICE_NOT_FOUND`.
+Quản lý thêm `?include_inactive=true` để thấy cả dịch vụ đã ngừng; với người khác tham số này bị bỏ qua, không báo lỗi.
 
 ```json
 [
@@ -126,7 +127,8 @@ Không cần đăng nhập (BR03). Chỉ trả dịch vụ đang hoạt động 
     "name": "Bao duong dinh ky 10.000 km",
     "description": "Thay dau dong co, loc dau, kiem tra tong quat 30 hang muc",
     "duration_minutes": 60,
-    "reference_price": 850000
+    "reference_price": 850000,
+    "is_active": true
   }
 ]
 ```
@@ -258,6 +260,24 @@ Chỉ `STAFF`, `MANAGER`. Chỉ áp dụng cho lịch đang `PENDING`.
 
 Response `200` là `AppointmentOut` đã cập nhật. Lỗi: `409 INVALID_STATUS_TRANSITION` (lịch không còn `PENDING`), `404 APPOINTMENT_NOT_FOUND`, `422` (thiếu lý do), `403 FORBIDDEN` (khách gọi).
 
+### 3.9b. `GET /appointments` - Danh sách lịch hẹn (F04, F06)
+
+Query, đều tùy chọn và kết hợp bằng AND: `status` (một trong 6 trạng thái), `date` (ngày hẹn), `from`, `to` (hai đầu đều được tính). "Ngày" là ngày của khung giờ, không phải ngày đặt.
+Khách chỉ thấy lịch của mình (BR23); Nhân viên và Quản lý thấy tất cả (BR18). Trả mảng `AppointmentOut` như mục 3.7, mới nhất trước; không có kết quả thì trả `[]`.
+Lỗi: `401`, `422 VALIDATION_ERROR` (trạng thái hoặc ngày sai định dạng), `422 INVALID_DATE_RANGE` (`to` trước `from`).
+
+### 3.9c. `POST /appointments/{id}/start` và `/complete` - Xe đến, hoàn thành (F04)
+
+Chỉ `STAFF`, `MANAGER`, không có body. `start`: `CONFIRMED -> IN_PROGRESS`; `complete`: `IN_PROGRESS -> COMPLETED`. Không nhảy cóc, không đi ngược (BR17).
+`IN_PROGRESS` vẫn giữ chỗ, `COMPLETED` trả chỗ (BR08). `handled_by` giữ là người xác nhận; ai bấm bước này nằm trong `history`.
+Response `200` là `AppointmentOut`. Lỗi: `409 INVALID_STATUS_TRANSITION`, `404 APPOINTMENT_NOT_FOUND`, `403 FORBIDDEN`.
+
+### 3.9d. `POST /services` và `PATCH /services/{id}` - Quản lý dịch vụ (F01)
+
+Chỉ `MANAGER`. `POST` body: `name` (bắt buộc, duy nhất), `description`, `duration_minutes` (> 0), `reference_price` (>= 0), `is_active` (mặc định `true`) theo BR04. Response `201` là `ServiceOut`.
+`PATCH` chỉ đổi trường được gửi; ngừng hoặc kích hoạt lại bằng `{"is_active": false}` hay `true`. Không gửi `null` cho `name`, `duration_minutes`, `reference_price`, `is_active`. **Không có DELETE** (BR05); lịch cũ giữ nguyên thông tin dịch vụ.
+Lỗi: `409 SERVICE_NAME_EXISTS` (kể cả trùng với dịch vụ đã ngừng), `404 SERVICE_NOT_FOUND`, `422 VALIDATION_ERROR`, `403 FORBIDDEN`.
+
 ### 3.10. `POST /appointments/{id}/cancel` và `/reschedule` - Khách hủy, đổi lịch (F05)
 
 Chỉ `CUSTOMER`, chỉ lịch của mình (lịch người khác: `404 APPOINTMENT_NOT_FOUND`). Chỉ lịch `PENDING` hoặc `CONFIRMED`, và còn từ **4 giờ** trở lên tính theo khung giờ hiện tại của lịch (BR19; đúng 4 giờ vẫn được).
@@ -299,12 +319,14 @@ Chỉ `MANAGER` (BR24). `from` mặc định ngày 1 của tháng này, `to` m�
 | Endpoint | Công khai | Khách | Nhân viên | Quản lý |
 |---|:-:|:-:|:-:|:-:|
 | `GET /services`, `/services/{id}` | ✓ | ✓ | ✓ | ✓ |
+| `POST /services`, `PATCH /services/{id}` | | | | ✓ |
 | `GET /slots` | | ✓ | ✓ | ✓ |
 | `PATCH /slots/{id}` | | | | ✓ |
 | `GET`, `POST /vehicles` | | ✓ | | |
 | `POST /appointments` | | ✓ | | |
+| `GET /appointments` | | của mình | ✓ | ✓ |
 | `GET /appointments/{id}` | | của mình | ✓ | ✓ |
-| `POST /appointments/{id}/confirm`, `/reject` | | | ✓ | ✓ |
+| `POST /appointments/{id}/confirm`, `/reject`, `/start`, `/complete` | | | ✓ | ✓ |
 
 Sai vai trò: `403 FORBIDDEN`. Chưa đăng nhập: `401 UNAUTHENTICATED`.
 Backend đọc lại tài khoản từ CSDL ở **mỗi request**, nên khóa tài khoản hoặc đổi vai trò có hiệu lực ngay, không cần chờ token hết hạn. Frontend nên coi mọi `403 ACCOUNT_DISABLED` như bị đăng xuất.
@@ -326,15 +348,9 @@ Bấm "Đặt lịch"                 POST /appointments        -> 201: hiển t
 Xem trạng thái                 GET /appointments/{id}    (history làm timeline)
 ```
 
-## 6. Đề xuất cho các endpoint chưa làm (cần cả nhóm thống nhất)
+## 6. Các endpoint đã bổ sung theo đề xuất
 
-Chưa đóng băng. Đây là đề xuất của Huy để Frontend lên kế hoạch; chốt lại ở buổi Planning Sprint 3 (Việc #35).
-
-| Endpoint | Đề xuất | Việc |
-|---|---|---|
-| `POST /services`, `PATCH /services/{id}` | Body như `ServiceOut` không có `service_id`; ngừng dịch vụ bằng `{"is_active": false}`, **không có DELETE** (BR05) | #26 |
-| `GET /appointments?status=&date=&from=&to=` | Khách chỉ thấy lịch của mình (BR23); nhân viên thấy tất cả (BR18); trả mảng `AppointmentOut` | #27, #38 |
-| `POST /appointments/{id}/start`, `/complete` | `CONFIRMED -> IN_PROGRESS -> COMPLETED`, không nhảy cóc, không đi ngược (BR17) | #27 |
+Ba nhóm endpoint đề xuất trước đây (quản lý dịch vụ, danh sách lịch hẹn, `start`/`complete`) đã làm xong theo đúng đề xuất, chi tiết ở mục 3.9b, 3.9c, 3.9d.
 
 **Quy ước khóa khi viết các luồng đổi/hủy** (để không deadlock với luồng đặt lịch): luôn khóa dòng `users` trước, rồi dòng `time_slots`; khi cần khóa hai khung giờ thì khóa theo `slot_id` tăng dần. Chi tiết trong `backend/app/appointments.py`.
 

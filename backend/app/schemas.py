@@ -39,6 +39,63 @@ class ServiceOut(BaseModel):
     description: str | None
     duration_minutes: int
     reference_price: int = Field(description="VND, chỉ để tham khảo (BR06)")
+    is_active: bool = Field(default=True, description="Chỉ Quản lý mới thấy dịch vụ đã ngừng (BR05)")
+
+
+class ServiceCreate(BaseModel):
+    """BR04: tên duy nhất, thời lượng > 0 phút, giá tham khảo >= 0 VND."""
+
+    name: str = Field(min_length=1, max_length=150)
+    description: str | None = Field(default=None, max_length=2000)
+    duration_minutes: int = Field(gt=0)
+    reference_price: int = Field(ge=0)
+    is_active: bool = True
+
+    @field_validator("name")
+    @classmethod
+    def _name_not_blank(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Tên dịch vụ không được để trống")
+        return v
+
+    @field_validator("description")
+    @classmethod
+    def _blank_description_is_none(cls, v: str | None) -> str | None:
+        return (v.strip() or None) if v is not None else None
+
+
+class ServiceUpdate(BaseModel):
+    """Chỉ trường nào được gửi mới đổi. Ngừng dịch vụ bằng {"is_active": false} (BR05)."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=150)
+    description: str | None = Field(default=None, max_length=2000)
+    duration_minutes: int | None = Field(default=None, gt=0)
+    reference_price: int | None = Field(default=None, ge=0)
+    is_active: bool | None = None
+
+    @field_validator("name")
+    @classmethod
+    def _name_not_blank(cls, v: str | None) -> str:
+        if v is None:
+            raise ValueError("Không được để null")
+        v = v.strip()
+        if not v:
+            raise ValueError("Tên dịch vụ không được để trống")
+        return v
+
+    @field_validator("description")
+    @classmethod
+    def _blank_description_is_none(cls, v: str | None) -> str | None:
+        return (v.strip() or None) if v is not None else None
+
+    @field_validator("duration_minutes", "reference_price", "is_active")
+    @classmethod
+    def _not_null(cls, v):
+        # Các cột này NOT NULL: gửi null tường minh phải bị từ chối, không được bỏ qua âm thầm.
+        if v is None:
+            raise ValueError("Không được để null")
+        return v
 
 
 # ---------- Xe ----------

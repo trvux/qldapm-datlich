@@ -1,11 +1,19 @@
+from datetime import date
+
 import psycopg
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 
 from app import appointments as svc
 from app.db import get_conn
 from app.deps import CUSTOMER, MANAGER, STAFF, CurrentUser, get_current_user, require_roles
 from app.errors import AppError
-from app.schemas import AppointmentCreate, AppointmentOut, RejectRequest, RescheduleRequest
+from app.schemas import (
+    AppointmentCreate,
+    AppointmentOut,
+    AppointmentStatus,
+    RejectRequest,
+    RescheduleRequest,
+)
 
 router = APIRouter(prefix="/appointments", tags=["Lịch hẹn (F03, F04, F05)"])
 
@@ -21,6 +29,31 @@ def create(
     appointment_id = svc.create_appointment(conn, user.user_id, body)
     response.headers["Location"] = f"/appointments/{appointment_id}"
     return svc.fetch_appointment(conn, appointment_id)
+
+
+@router.get("", response_model=list[AppointmentOut])
+def list_all(
+    status: AppointmentStatus | None = Query(None, description="Lọc theo trạng thái"),
+    on_date: date | None = Query(None, alias="date", description="Ngày hẹn (YYYY-MM-DD)"),
+    date_from: date | None = Query(None, alias="from", description="Từ ngày hẹn"),
+    date_to: date | None = Query(None, alias="to", description="Đến ngày hẹn"),
+    user: CurrentUser = Depends(get_current_user),
+    conn: psycopg.Connection = Depends(get_conn),
+):
+    """Danh sách lịch hẹn, mới nhất trước (F04, F06, BR18, BR23).
+
+    Khách chỉ thấy lịch của mình; Nhân viên và Quản lý thấy tất cả. Các bộ lọc kết hợp bằng AND.
+    """
+    if date_from and date_to and date_to < date_from:
+        raise AppError(422, "INVALID_DATE_RANGE", "`to` phải lớn hơn hoặc bằng `from`.")
+    return svc.list_appointments(
+        conn,
+        customer_id=user.user_id if user.role == CUSTOMER else None,
+        status=status,
+        on_date=on_date,
+        date_from=date_from,
+        date_to=date_to,
+    )
 
 
 @router.get("/{appointment_id}", response_model=AppointmentOut)
@@ -60,8 +93,8 @@ def reschedule(
     return svc.fetch_appointment(conn, appointment_id)
 
 
-# ---- Bản tối thiểu của F04 để chạy được luồng "nhân viên xác nhận lịch" (Việc #32). ----
-# Danh sách/lọc lịch, bắt đầu xử lý, hoàn thành thuộc Việc #27 (Quang).
+# ---- F04: nhân viên xử lý lịch (Việc #27). Danh sách/lọc ở trên; xác nhận, từ chối, bắt đầu,
+# hoàn thành ở dưới. Chỉ Nhân viên và Quản lý (BR03). ----
 
 
 @router.post("/{appointment_id}/confirm", response_model=AppointmentOut)
@@ -82,4 +115,26 @@ def reject(
     conn: psycopg.Connection = Depends(get_conn),
 ):
     svc.reject_appointment(conn, appointment_id, user.user_id, body.reason)
+    return svc.fetch_appointment(conn, appointment_id)
+
+
+@router.post("/{appointment_id}/start", response_model=AppointmentOut)
+def start(
+    appointment_id: int,
+    user: CurrentUser = Depends(require_roles(STAFF, MANAGER)),
+    conn: psycopg.Connection = Depends(get_conn),
+):
+    """Xe đã đến trung tâm: Đã xác nhận -> Đang thực hiện (BR17)."""
+    svc.start_appointment(conn, appointment_id, user.user_id)
+    return svc.fetch_appointment(conn, appointment_id)
+
+
+@router.post("/{appointment_id}/complete", response_model=AppointmentOut)
+def complete(
+    appointment_id: int,
+    user: CurrentUser = Depends(require_roles(STAFF, MANAGER)),
+    conn: psycopg.Connection = Depends(get_conn),
+):
+    """Xong việc: Đang thực hiện -> Hoàn thành, trả chỗ cho khung giờ (BR08, BR17)."""
+    svc.complete_appointment(conn, appointment_id, user.user_id)
     return svc.fetch_appointment(conn, appointment_id)

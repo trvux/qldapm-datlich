@@ -20,9 +20,10 @@ Ngoài kế hoạch, để chạy được luồng "nhân viên xác nhận lị
 |---|---|---|
 | #37 | Đổi và hủy lịch (F05) | `app/appointments.py`, `app/routers/appointments.py`, `tests/test_change_cancel.py` |
 | #39 | Báo cáo thống kê (F08) | `app/routers/reports.py`, `tests/test_reports.py` |
+| #26, #27, #38 | Bổ sung endpoint Frontend đã gọi: quản lý dịch vụ (F01), danh sách lịch hẹn, `start`/`complete` (F04) | `app/routers/services.py`, `app/routers/appointments.py`, `app/appointments.py`, `tests/test_staff_and_services.py` |
 | #42 | Rà soát và sửa lỗi Backend (mới phần tự rà soát) | `app/errors.py`, `tests/test_hardening.py`, [`docs/sprint3/Viec37_39_42_KetQua_Backend.md`](../docs/sprint3/Viec37_39_42_KetQua_Backend.md) |
 
-Đặc tả ở [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) mục 3.10, 3.11.
+Đặc tả ở [`docs/api/Viec22_DacTa_API.md`](../docs/api/Viec22_DacTa_API.md) mục 3.9b, 3.9c, 3.9d, 3.10, 3.11.
 
 ## Chạy nhanh
 

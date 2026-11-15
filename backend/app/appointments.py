@@ -1,5 +1,5 @@
-"""Nghiệp vụ lịch hẹn: đặt lịch (F03 + F07) và xử lý của nhân viên (F04, bản tối thiểu)."""
-from datetime import timedelta
+"""Nghiệp vụ lịch hẹn: đặt lịch (F03 + F07), xử lý của nhân viên (F04), đổi/hủy (F05)."""
+from datetime import date, timedelta
 
 import psycopg
 from psycopg import errors as pg_errors
@@ -236,6 +236,90 @@ def reject_appointment(
     conn: psycopg.Connection, appointment_id: int, staff_id: int, reason: str
 ) -> None:
     _decide_pending(conn, appointment_id, staff_id, "REJECTED", reject_reason=reason)
+
+
+# ---------------------------------------------------------------------------------------------
+# F04: danh sách lịch hẹn, bắt đầu xử lý, hoàn thành (Việc #27, BR17, BR18, BR23)
+# ---------------------------------------------------------------------------------------------
+
+
+def list_appointments(
+    conn: psycopg.Connection,
+    *,
+    customer_id: int | None = None,
+    status: str | None = None,
+    on_date: date | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+) -> list[dict]:
+    """Danh sách lịch hẹn, mới nhất trước. customer_id đặt thì chỉ lịch của khách đó (BR23).
+
+    Ngày là ngày hẹn (slot_date), không phải ngày đặt. Các bộ lọc kết hợp bằng AND.
+    """
+    where, params = [], []
+    if customer_id is not None:
+        where.append("a.customer_id = %s")
+        params.append(customer_id)
+    if status is not None:
+        where.append("a.status = %s")
+        params.append(status)
+    if on_date is not None:
+        where.append("t.slot_date = %s")
+        params.append(on_date)
+    if date_from is not None:
+        where.append("t.slot_date >= %s")
+        params.append(date_from)
+    if date_to is not None:
+        where.append("t.slot_date <= %s")
+        params.append(date_to)
+    clause = ("WHERE " + " AND ".join(where)) if where else ""
+    ids = conn.execute(
+        f"""SELECT a.appointment_id
+            FROM appointments a JOIN time_slots t ON t.slot_id = a.slot_id
+            {clause} ORDER BY a.appointment_id DESC""",
+        params,
+    ).fetchall()
+    return [fetch_appointment(conn, r["appointment_id"]) for r in ids]
+
+
+def _advance(
+    conn: psycopg.Connection, appointment_id: int, staff_id: int, from_status: str, to_status: str
+) -> None:
+    """Chuyển trạng thái đúng một bước, không nhảy cóc, không đi ngược (BR17)."""
+    with conn.transaction():
+        row = conn.execute(
+            "SELECT status FROM appointments WHERE appointment_id = %s FOR UPDATE",
+            (appointment_id,),
+        ).fetchone()
+        if row is None:
+            raise AppError(404, "APPOINTMENT_NOT_FOUND", "Không tìm thấy lịch hẹn.")
+        if row["status"] != from_status:
+            raise AppError(
+                409,
+                "INVALID_STATUS_TRANSITION",
+                f"Lịch đang ở trạng thái {row['status']}, không thể chuyển sang {to_status}.",
+            )
+        # handled_by giữ nguyên là người xác nhận (BR16); ai bấm bước này nằm trong lịch sử.
+        conn.execute(
+            "UPDATE appointments SET status = %s, updated_at = now() WHERE appointment_id = %s",
+            (to_status, appointment_id),
+        )
+        conn.execute(
+            """INSERT INTO appointment_status_history
+                   (appointment_id, old_status, new_status, changed_by)
+               VALUES (%s, %s, %s, %s)""",
+            (appointment_id, from_status, to_status, staff_id),
+        )
+
+
+def start_appointment(conn: psycopg.Connection, appointment_id: int, staff_id: int) -> None:
+    """Xe đã đến: Đã xác nhận -> Đang thực hiện. Vẫn giữ chỗ (BR08)."""
+    _advance(conn, appointment_id, staff_id, "CONFIRMED", "IN_PROGRESS")
+
+
+def complete_appointment(conn: psycopg.Connection, appointment_id: int, staff_id: int) -> None:
+    """Xong việc: Đang thực hiện -> Hoàn thành. Hoàn thành không còn chiếm chỗ (BR08)."""
+    _advance(conn, appointment_id, staff_id, "IN_PROGRESS", "COMPLETED")
 
 
 # ---------------------------------------------------------------------------------------------

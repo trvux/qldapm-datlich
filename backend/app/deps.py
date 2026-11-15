@@ -51,6 +51,17 @@ def get_current_user(
     return CurrentUser(row["user_id"], row["full_name"], row["email"], row["role_name"])
 
 
+def get_optional_user(
+    creds: HTTPAuthorizationCredentials | None = Depends(_bearer),
+    conn: psycopg.Connection = Depends(get_conn),
+) -> CurrentUser | None:
+    """Cho endpoint công khai nhưng có thêm quyền khi đã đăng nhập (ví dụ Quản lý xem dịch vụ
+    đã ngừng). Không gửi token thì là khách vãng lai; gửi token sai vẫn trả 401 như mọi nơi."""
+    if creds is None:
+        return None
+    return get_current_user(creds, conn)
+
+
 def require_roles(*roles: str):
     """Dependency kiểm tra ma trận phân quyền BR03: sai vai trò trả 403."""
 
