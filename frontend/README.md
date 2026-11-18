@@ -1,3 +1,5 @@
+> **Giao diện bản v1.0 (mốc nộp đồ án), giữ lại để đối chiếu.** Giao diện hiện hành mang thương hiệu Marque nằm ở [`../web/`](../web/README.md); chạy trực tuyến tại <https://marque.phren.dev>.
+
 # Frontend - Hệ thống Quản lý Đặt lịch Bảo dưỡng và Sửa chữa Ô tô Trực tuyến XYZ
 
 Thư mục `frontend/` chứa toàn bộ mã nguồn giao diện người dùng (Single-Page Web Application) do thành viên **Trần Ngọc Tôn Tri** xây dựng và hoàn thiện qua **Sprint 2 (Việc #24, #26, #31)** và **Sprint 3 (Việc #38, #43, #48)**.

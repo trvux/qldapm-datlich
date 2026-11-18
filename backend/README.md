@@ -1,4 +1,4 @@
-# Backend - đặt lịch bảo dưỡng ô tô XYZ
+# Backend - Marque, đặt lịch bảo dưỡng ô tô (Trung tâm XYZ trong đề bài)
 
 Thư mục `backend/` của repo dự án tổng (xem [README gốc](../README.md)). Người phụ trách: Huỳnh Bảo Huy. Mọi lệnh trong file này chạy **trong thư mục `backend/`**.
 
@@ -59,7 +59,7 @@ Mỗi khách có 2 xe. Có 8 dịch vụ (1 đã ngừng để test BR05) và kh
 uv run pytest -v
 ```
 
-133 test, chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
+170 test (169 tại bản v1.0), chạy trên PostgreSQL thật qua HTTP, tự tạo database `datlich_test` riêng. Chi tiết ở `docs/sprint2/Viec32_KetQua_ChayThu.md`.
 
 ## Cấu trúc
 
@@ -85,6 +85,6 @@ tests/               test đăng nhập, đặt lịch, đổi/hủy lịch, bá
 - **Thứ tự khóa:** luôn khóa dòng khách trước, dòng khung giờ sau (khung giờ theo `slot_id` tăng dần) để luồng đổi/hủy không deadlock với luồng đặt lịch.
 - **Không có `JWT_SECRET` mặc định:** thiếu biến này thì app không khởi động.
 
-## Vấn đề đang mở
+## Vấn đề từng mở (đã giải quyết)
 
-Wireframe WF-03 vẽ 4 ca 2 giờ nhưng quy tắc nghiệp vụ và CSDL dùng 8 khung 1 giờ. Cần cả nhóm chọn hướng, xem `docs/api/Viec22_DacTa_API.md` mục 8.
+Wireframe WF-03 từng vẽ 4 ca 2 giờ trong khi quy tắc nghiệp vụ và CSDL dùng 8 khung 1 giờ. Wireframe đã sửa theo 8 khung 1 giờ và giao diện dùng đúng 8 khung; chi tiết ở `docs/api/Viec22_DacTa_API.md` mục 8.
