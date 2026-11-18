@@ -39,7 +39,9 @@ function LoginForm() {
     try {
       const u = await login(email.trim(), password)
       toast.success(`Xin chào ${u.full_name}.`)
-      router.replace(next && next.startsWith("/") ? next : isStaffRole(u.role) ? "/admin" : "/lich-hen")
+      const safe = next && next.startsWith("/") && !next.startsWith("//") ? next : null
+      const allowNext = safe && (isStaffRole(u.role) || !safe.startsWith("/admin"))
+      router.replace(allowNext ? safe : isStaffRole(u.role) ? "/admin" : "/lich-hen")
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
